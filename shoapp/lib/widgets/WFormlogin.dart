@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'WTextFormField.dart';
 import 'package:lottie/lottie.dart';
 import 'package:line_icons/line_icons.dart';
+import 'package:shoapp/connection/Connection.dart';
+import 'dart:convert';
+import 'package:shoapp/utils/SharedPreferencesApp.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WFormLogin extends StatefulWidget {
   const WFormLogin({Key? key}) : super(key: key);
@@ -12,6 +16,22 @@ class WFormLogin extends StatefulWidget {
 
 class _WFormLoginState extends State<WFormLogin> {
   final _formKey = GlobalKey<FormState>();
+  //final TextEditingController controllerEmail = TextEditingController(),
+      //controllerPassword = TextEditingController();
+  final WTextFormField wTextFormFieldEmail = WTextFormField(
+    hint: "Endereço de e-mail",
+    icon: Icons.person,
+    keyboardType: TextInputType.emailAddress,
+  ),
+      wTextFormFieldPassword = WTextFormField(
+    hint: "Senha",
+    isPassword: true,
+    icon: Icons.password,
+  );
+  //SharedPreferencesApp s = SharedPreferencesApp();
+  @override
+  void initState(){
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +58,7 @@ class _WFormLoginState extends State<WFormLogin> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: WTextFormField(
-                  hint: "Endereço de e-mail",
-                  icon: Icons.person,
-                  keyboardType: TextInputType.emailAddress,
-                ),
+                child: wTextFormFieldEmail,
                 width: 400,
                 height: 50,
               ),
@@ -54,11 +70,7 @@ class _WFormLoginState extends State<WFormLogin> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: WTextFormField(
-                  hint: "Senha",
-                  isPassword: true,
-                  icon: Icons.password,
-                ),
+                child: wTextFormFieldPassword,
                 width: 400,
                 height: 50,
               ),
@@ -80,9 +92,34 @@ class _WFormLoginState extends State<WFormLogin> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        print("Valido");
-                        bool valid = _formKey.currentState!.validate();
-                        if (valid) Navigator.pushNamed(context, '/');
+                        Connection.auth(wTextFormFieldEmail.getText(), wTextFormFieldPassword.getText()).then((value){
+                          Map<String, dynamic> response = jsonDecode(value);
+                          if(response['token'] != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Sucesso ao logar!"),
+                                  backgroundColor: Colors.green,
+                                )
+                            );
+                            final sharedPreferenceApp = SharedPreferences.getInstance().then((SharedPreferences value) {
+                              value.setString("type", response['type']).then((value) {
+                                print("Salvou type...");
+                              });
+                              value.setString("token", response['token']).then((value) {
+                                print("Salvou token...");
+                              });
+                            });
+                            //muda de tela
+                            Navigator.pushNamed(context, '/');
+                          }else{
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text("Credenciais erradas!"),
+                                  backgroundColor: Colors.red,
+                                )
+                            );
+                          }
+                        });
                       }
                     },
                     child: Row(

@@ -3,6 +3,7 @@ import 'package:shoapp/Product.dart';
 import 'package:shoapp/widgets/WButton.dart';
 import 'package:provider/provider.dart';
 import '../PCartModel.dart';
+import 'package:shoapp/connection/connection.dart';
 
 class RouteProduct extends StatelessWidget {
   const RouteProduct({Key? key}) : super(key: key);
@@ -64,7 +65,12 @@ class RouteProduct extends StatelessWidget {
                 text: "Comprar",
                 icon: Icons.shopping_cart,
                 onTap: () {
-                  print("a");
+                  /*Connection.getAttr().then((value){
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
+                  });*/
+                  var v = Connection.getAttr();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(v.toString())));
+
                   var cart = Provider.of<CartModel>(context, listen: false);
                   //Provider.of<CartModel>(context, listen: false)
                   cart.add(product);
@@ -78,31 +84,6 @@ class RouteProduct extends StatelessWidget {
               Consumer<CartModel>(
                   builder: (_, cart, __) =>
                       Text("${cart.getQuantity().toString()}")),
-              /*MultiProvider(
-              providers: [
-                ChangeNotifierProvider(
-                  create: (context) => CartModel(),
-                )
-              ],
-              child: Consumer<CartModel>(
-                builder: (context, cart, child){
-                  return wButton(
-                    width: 200,
-                    height: 50,
-                    text: "Comprar",
-                    icon: Icons.shopping_cart,
-                    onTap: () {
-                      print("a");
-                      //var reportState = Provider.of<ReportState>(context, listen: false);
-                      cart.add(product);
-                      print(cart.getQuantity());
-                      //c.add(Product("d","dd","ddd",10,true));
-                    },
-                    color: Colors.blueGrey,
-                  );
-                },
-              ),
-            ),*/
             ],
           ),
         ),
@@ -118,7 +99,7 @@ class RouteProduct extends StatelessWidget {
               ),
               Positioned(
                 bottom: -150,
-                child: Image.asset(
+                child: Image.network(
                   product.url.toString(),
                   height: 300,
                 ),

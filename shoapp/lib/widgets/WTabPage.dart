@@ -11,6 +11,10 @@ import 'WButton.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shoapp/connection/Connection.dart';
+import 'package:shoapp/utils/SharedPreferencesApp.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TabPage extends StatefulWidget {
   @override
@@ -22,8 +26,8 @@ class _TabPageState extends State<TabPage> {
   int badge = 0;
   final padding = EdgeInsets.symmetric(horizontal: 18, vertical: 12);
   double gap = 10;
-
   PageController controller = PageController();
+  String title = "";
 
   List<Color> colors = [
     //Color(0xFFEEEEEE),
@@ -35,35 +39,68 @@ class _TabPageState extends State<TabPage> {
 
   List<Product> products = [
     new Product(
-        url: "assets/product1.png",
+      url: "https://img.terabyteshop.com.br/produto/g/placa-de-video-palit-nvidia-geforce-rtx-3080ti-gamingpro-12gb-gddr6x-384bit-ned308t019kb-132aa_123399.png",
         title: "PLACA NVIDIA 5432X",
         desc: "Ideal para seus jogos",
         value: 5899.99,
         favorite: true),
     new Product(
-        url: "assets/product2.png",
+        url: "https://images.lojanike.com.br/1024x1024/produto/tenis-nike-air-max-2090-masculino-BV9977-800-1.png",
         title: "TÊNIS NIKE AIR PLUS",
         desc: "Mais conforto para seu esporte",
         value: 1359.99,
         favorite: false),
     new Product(
-        url: "assets/product3.png",
+        url: "https://tecnoblog.net/wp-content/uploads/2020/11/xbox_series_x_produto.png",
         title: "XBOX MAX",
         desc: "Mais desempenho e qualidade",
         value: 12899.99,
         favorite: true),
     new Product(
-        url: "assets/moyses.jpg",
-        title: "Livro Moyses",
-        desc: "Livro de qualidade",
-        value: 79.99,
-        favorite: true),
+        url: "https://novomundo.vteximg.com.br/arquivos/ids/1115042-500-500/geladeira-refrigerador-electrolux-side-by-side-frost-free-579l-inox-dm84x-220v-50566-0.jpg?v=636512645576830000",
+        title: "Geladeira Electrolux",
+        desc: "Gela demais.",
+        value: 9999.99,
+        favorite: false),
   ];
+
+  //SharedPreferencesApp s = SharedPreferencesApp();
 
   @override
   void initState() {
     super.initState();
+    final sharedPreferenceApp = SharedPreferences.getInstance().then((SharedPreferences value) {
+      final sharedPreferenceApp = SharedPreferences.getInstance().then((SharedPreferences value) {
+        String type = value.getString("type")!;
+        String token = value.getString("token")!;
+        /* Busca dados do user logado */
+        Connection.me(type, token).then((value) {
+          setState((){
+            Map<String, dynamic> user = jsonDecode(value);
+            title = "SHOPAPP. Bem vindo(a), ${user['email']}";
+          });
+        });
+        /* Busca de produtos */
+        Connection.products().then((value) {
+          //setState((){
+          List productsListAPI = jsonDecode(value);
+            for(var product in productsListAPI){
+                products.add(new Product(
+                    url: product['picture'],
+                    title: product['name'],
+                    desc: product['description'],
+                    value: double.parse(product['value'].toString()),
+
+                    favorite: false
+                ));
+              //print(product['name']);
+            }
+          //});
+        });
+      });
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -116,25 +153,6 @@ class _TabPageState extends State<TabPage> {
               buildGButtonWithBadge("Carrinho", Icons.shopping_cart),
               buildGButton("Pagamento", Icons.attach_money),
               buildGButton("Perfil", Icons.person),
-              /*
-              GButton(
-                gap: gap,
-                iconActiveColor: Colors.teal,
-                iconColor: Colors.teal,
-                textColor: Colors.teal,
-                backgroundColor: Colors.teal.withOpacity(.2),
-                iconSize: 24,
-                padding: padding,
-                icon: LineIcons.user,
-                leading: CircleAvatar(
-                  radius: 12,
-                  backgroundImage: NetworkImage(
-                    'https://sooxt98.space/content/images/size/w100/2019/01/profile.png',
-                  ),
-                ),
-                text: 'Sheldon',
-              )
-               */
             ],
             selectedIndex: selectedIndex,
             onTabChange: (index) {
@@ -161,16 +179,11 @@ class _TabPageState extends State<TabPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              /*Lottie.network(
-                  "https://assets4.lottiefiles.com/private_files/lf30_x2lzmtdl.json",
-                  width: 200,
-                  height: 200
-                ),*/
               Container(
                 width: 300,
                 height: 150,
                 child: WText(
-                    text: "Ecommerce, tudo o que você procura",
+                    text: title,
                     color: Colors.teal,
                     topPadding: 20,
                     bottomPadding: 20,
@@ -261,13 +274,6 @@ class _TabPageState extends State<TabPage> {
                               horizontal: 10, vertical: 5),
                           child: Container(
                             decoration: BoxDecoration(
-                              /*boxShadow: [
-                          BoxShadow(
-                              color: Colors.blueGrey,
-                              blurRadius: 8,
-                              spreadRadius: 1,
-                          ),
-                        ],*/
                               borderRadius: BorderRadius.circular(10),
                               color: Colors.teal,
                             ),
@@ -278,7 +284,7 @@ class _TabPageState extends State<TabPage> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.all(5.0),
-                                  child: Image.asset(
+                                  child: Image.network(
                                     cart.products[index].url,
                                     width: 120,
                                     fit: BoxFit.contain,
@@ -348,9 +354,6 @@ class _TabPageState extends State<TabPage> {
                     height: 200,
                     child: Text("s"),
                     decoration: BoxDecoration(
-                      /* borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(50.0),
-                          bottomRight: Radius.circular(50.0)),*/
                       color: Colors.teal,
                     )),
                 Positioned(
@@ -431,29 +434,6 @@ class _TabPageState extends State<TabPage> {
           color: Colors.teal,
         ),
       ),
-      /*
-      leading: selectedIndex == 1 || badge == 0
-                        ? null
-                        : Badge(
-                            badgeColor: Colors.red.shade100,
-                            elevation: 0,
-                            position: BadgePosition.topEnd(top: -12, end: -12),
-                            badgeContent: Text(
-                              badge.toString(),
-                              style: TextStyle(color: Colors.red.shade900),
-                            ),
-                            child: Icon(
-                              LineIcons.heart,
-                              color: selectedIndex == 1
-                                  ? Colors.pink
-                                  : Colors.black,
-                            ),
-                          ),
-                    text: 'Likes',
-                  ),
-
-
-       */
     );
   }
 
@@ -468,28 +448,6 @@ class _TabPageState extends State<TabPage> {
       padding: padding,
       icon: icon,
       text: text,
-
-      /*
-      leading: selectedIndex == 1 || badge == 0
-                        ? null
-                        : Badge(
-                            badgeColor: Colors.red.shade100,
-                            elevation: 0,
-                            position: BadgePosition.topEnd(top: -12, end: -12),
-                            badgeContent: Text(
-                              badge.toString(),
-                              style: TextStyle(color: Colors.red.shade900),
-                            ),
-                            child: Icon(
-                              LineIcons.heart,
-                              color: selectedIndex == 1
-                                  ? Colors.pink
-                                  : Colors.black,
-                            ),
-                          ),
-                    text: 'Likes',
-                  ),
-       */
     );
   }
 }

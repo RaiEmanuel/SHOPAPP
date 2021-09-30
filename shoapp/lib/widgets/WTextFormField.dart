@@ -19,6 +19,10 @@ class WTextFormField extends StatelessWidget {
     this.isPassword = false,
   }) : super(key: key);
 
+  String getText(){
+    return _controller.text;
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(

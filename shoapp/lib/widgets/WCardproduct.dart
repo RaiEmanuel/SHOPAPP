@@ -7,7 +7,7 @@ Widget wCardProduct(List<Product> products, BuildContext context) {
   return Container(
     height: 350,
     width: 500,
-    child: ListView(
+    /*child: ListView(
       shrinkWrap: true,
       scrollDirection: Axis.horizontal,
       children: [
@@ -15,7 +15,17 @@ Widget wCardProduct(List<Product> products, BuildContext context) {
         WCard(products[1]),
         WCard(products[2]),
         WCard(products[3]),
+        WCard(products[4]),
+        WCard(products[5]),
       ],
+    ),*/
+    child: ListView.builder(
+      itemCount: products.length,
+      itemBuilder: (context, index){
+        return WCard(products[index]);
+      },
+      shrinkWrap: true,
+      scrollDirection: Axis.horizontal,
     ),
   );
 }
@@ -69,7 +79,7 @@ class _WCardState extends State<WCard> {
                   child: Container(
                     width: 150,
                     height: 150,
-                    child: Image.asset(
+                    child: Image.network(
                       p.url,
                       fit: BoxFit.contain,
                     ),

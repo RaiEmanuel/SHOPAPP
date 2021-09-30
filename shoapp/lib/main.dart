@@ -4,21 +4,27 @@ import 'routes/RouteProduct.dart';
 import 'routes/RouteLogin.dart';
 import 'widgets/WTabPage.dart';
 import 'PCartModel.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() => runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => CartModel(),
-          ),
-        ],
-        child: MaterialApp(
-          initialRoute: '/login',
-          routes: {
-            '/': (BuildContext context) => TabPage(),
-            '/product': (BuildContext context) => RouteProduct(),
-            '/login': (BuildContext context) => RouteLogin(),
-          },
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => CartModel(),
         ),
+      ],
+      child: MaterialApp(
+        initialRoute: '/login',
+        routes: {
+          '/': (BuildContext context) => TabPage(),
+          '/product': (BuildContext context) => RouteProduct(),
+          '/login': (BuildContext context) => RouteLogin(),
+        },
       ),
-    );
+    ),
+  );
+}
