@@ -18,6 +18,7 @@ void main() {
         ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         initialRoute: '/login',
         routes: {
           '/': (BuildContext context) => TabPage(),

@@ -31,6 +31,23 @@ class WCreditCardState extends State<WCreditCard> {
       ),
       home: Scaffold(
         resizeToAvoidBottomInset: false,
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          title: Text("Compra",style:TextStyle(color: Colors.teal)),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+                Icons.arrow_back_ios,
+              color: Colors.teal,
+            ),
+            iconSize: 30,
+          ),
+        ),
         body: SafeArea(
           child: Column(
             children: <Widget>[

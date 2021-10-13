@@ -26,10 +26,13 @@ class CartModel extends ChangeNotifier {
   }
 
   void add(Product product) {
-    _productsList.add(product);
-    totalPrice += product.value;
-    // This call tells the widgets that are listening to this model to rebuild.
-    notifyListeners();
+    if(!_productsList.contains(product)){
+      _productsList.add(product);
+      totalPrice += product.value;
+      // This call tells the widgets that are listening to this model to rebuild.
+      notifyListeners();
+    }
+
   }
 
   /// Removes all items from the cart.

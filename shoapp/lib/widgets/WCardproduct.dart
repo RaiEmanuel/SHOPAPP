@@ -78,10 +78,13 @@ class _WCardState extends State<WCard> {
                   padding: const EdgeInsets.all(15.0),
                   child: Container(
                     width: 150,
-                    height: 150,
-                    child: Image.network(
-                      p.url,
-                      fit: BoxFit.contain,
+                    color: Colors.red,
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: Image.network(
+                        p.url,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
                 ),

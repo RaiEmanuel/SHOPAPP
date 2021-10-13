@@ -11,13 +11,23 @@ class RouteProduct extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = ModalRoute.of(context)!.settings.arguments as Product;
-
+    String grupal = "abc";
+    /* ID da cor no banco é selecionada */
+    int selectedColor = 0;
     return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           elevation: 0,
           backgroundColor: Colors.transparent,
-          leading: GestureDetector(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            iconSize: 30,
+            onPressed: () {
+              print("Voltou");
+              Navigator.pop(context);
+            },
+          ),
+          /*GestureDetector(
             onTap: () {
               Navigator.pop(context);
             },
@@ -29,16 +39,23 @@ class RouteProduct extends StatelessWidget {
                 size: 35,
               ),
             ),
-          ),
+          ),*/
           actions: [
-            Padding(
+            /*Padding(
               padding: const EdgeInsets.all(20.0),
               child: Icon(
                 Icons.favorite,
                 color: Colors.white,
                 size: 35,
               ),
-            )
+            )*/
+            IconButton(
+              onPressed: () {
+                print("Favoritou");
+              },
+              icon: Icon(Icons.favorite),
+              iconSize: 30,
+            ),
           ],
         ),
         bottomNavigationBar: Container(
@@ -68,8 +85,9 @@ class RouteProduct extends StatelessWidget {
                   /*Connection.getAttr().then((value){
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
                   });*/
-                  var v = Connection.getAttr();
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(v.toString())));
+                  //var v = Connection.getAttr();
+                  //ScaffoldMessenger.of(context)
+                      //.showSnackBar(SnackBar(content: Text(v.toString())));
 
                   var cart = Provider.of<CartModel>(context, listen: false);
                   //Provider.of<CartModel>(context, listen: false)
@@ -81,9 +99,9 @@ class RouteProduct extends StatelessWidget {
                 colorIcon: Colors.teal,
                 colorText: Colors.teal,
               ),
-              Consumer<CartModel>(
+              /*Consumer<CartModel>(
                   builder: (_, cart, __) =>
-                      Text("${cart.getQuantity().toString()}")),
+                      Text("${cart.getQuantity().toString()}")),*/
             ],
           ),
         ),
@@ -99,9 +117,14 @@ class RouteProduct extends StatelessWidget {
               ),
               Positioned(
                 bottom: -150,
-                child: Image.network(
-                  product.url.toString(),
-                  height: 300,
+                child: Container(
+                  width: 150,
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: Image.network(
+                      product.url.toString(),
+                    ),
+                  ),
                 ),
               )
             ],
@@ -115,11 +138,6 @@ class RouteProduct extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    /*Container(
-                    color: Colors.blueGrey,
-                    width: double.infinity,
-                    child: Text("sgggg"),
-                  ),*/
                     Row(
                       //linha do titulo
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -135,11 +153,7 @@ class RouteProduct extends StatelessWidget {
                                 fontSize: 26, fontWeight: FontWeight.bold),
                           ),
                         ),
-                        Container(
-                          width: 40,
-                          height: 34,
-                          color: Colors.red,
-                        )
+                        WDropDownQuantityPurchase()
                       ],
                     ),
                     Column(
@@ -158,37 +172,57 @@ class RouteProduct extends StatelessWidget {
                         ),
                         Row(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(100),
-                                  color: Colors.deepPurple,
+                            //ColorSelector(),
+                            /* componentizar */
+                            GestureDetector(
+                              onTap: () {
+                                print("Sou Roxo");
+                                selectedColor = 0;
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(100),
+                                    color: Colors.deepPurple,
+                                  ),
+                                  width: 25,
+                                  height: 25,
                                 ),
-                                width: 25,
-                                height: 25,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(100),
-                                  color: Colors.amber,
+                            GestureDetector(
+                              onTap: () {
+                                print("Sou Azul");
+                                selectedColor = 1;
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(100),
+                                    color: Colors.blue,
+                                  ),
+                                  width: 25,
+                                  height: 25,
                                 ),
-                                width: 25,
-                                height: 25,
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(100),
-                                  color: Colors.red,
+                            GestureDetector(
+                              onTap: () {
+                                print("Sou Rosa");
+                                selectedColor = 2;
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(100),
+                                    color: Colors.pinkAccent,
+                                  ),
+                                  width: 25,
+                                  height: 25,
                                 ),
-                                width: 25,
-                                height: 25,
                               ),
                             ),
                           ],
@@ -208,5 +242,95 @@ class RouteProduct extends StatelessWidget {
                 ),
               )),
         ]));
+  }
+}
+
+class ColorSelector extends StatefulWidget {
+  const ColorSelector({Key? key}) : super(key: key);
+
+  @override
+  _ColorSelectorState createState() => _ColorSelectorState();
+}
+
+class _ColorSelectorState extends State<ColorSelector> {
+  String grupal = "aaa";
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 120,
+          height: 60,
+          child: RadioListTile<String>(
+            title: Text("Radio"),
+            value: "abc",
+            groupValue: grupal,
+            onChanged: (String? value) {
+              setState(() {
+                grupal = value!;
+              });
+            },
+          ),
+        ),
+        Container(
+          width: 120,
+          height: 60,
+          child: RadioListTile<String>(
+            title: Text("Radio"),
+            value: "def",
+            groupValue: grupal,
+            onChanged: (String? value) {
+              setState(() {
+                grupal = value!;
+              });
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// This is the stateful widget that the main application instantiates.
+class WDropDownQuantityPurchase extends StatefulWidget {
+  const WDropDownQuantityPurchase({Key? key}) : super(key: key);
+
+  @override
+  State<WDropDownQuantityPurchase> createState() =>
+      _WDropDownQuantityPurchaseState();
+}
+
+/// This is the private State class that goes with MyStatefulWidget.
+class _WDropDownQuantityPurchaseState extends State<WDropDownQuantityPurchase> {
+  String dropdownValue = '1';
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      value: dropdownValue,
+      icon: const Icon(
+        Icons.arrow_downward,
+      ),
+      iconSize: 24,
+      elevation: 0,
+      style: const TextStyle(color: Colors.teal),
+      underline: Container(
+        height: 2,
+        color: Colors.teal,
+      ),
+      onChanged: (String? newValue) {
+        setState(() {
+          dropdownValue = newValue!;
+        });
+      },
+      items: <String>['1', '2', '3', '4']
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: (value == '1' ? Text('$value item') : Text('$value itens')),
+        );
+      }).toList(),
+    );
   }
 }

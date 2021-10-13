@@ -16,22 +16,25 @@ class WFormLogin extends StatefulWidget {
 
 class _WFormLoginState extends State<WFormLogin> {
   final _formKey = GlobalKey<FormState>();
+
   //final TextEditingController controllerEmail = TextEditingController(),
-      //controllerPassword = TextEditingController();
+  //controllerPassword = TextEditingController();
   final WTextFormField wTextFormFieldEmail = WTextFormField(
-    hint: "Endereço de e-mail",
-    icon: Icons.person,
-    keyboardType: TextInputType.emailAddress,
-  ),
+    label: "Email",
+    hint: "digite seu e-mail",
+        icon: Icons.person,
+        keyboardType: TextInputType.emailAddress,
+      ),
       wTextFormFieldPassword = WTextFormField(
-    hint: "Senha",
-    isPassword: true,
-    icon: Icons.password,
-  );
+        label: "Senha",
+        hint: "Digite sua senha",
+        isPassword: true,
+        icon: Icons.password,
+      );
+
   //SharedPreferencesApp s = SharedPreferencesApp();
   @override
-  void initState(){
-  }
+  void initState() {}
 
   @override
   Widget build(BuildContext context) {
@@ -92,32 +95,36 @@ class _WFormLoginState extends State<WFormLogin> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        Connection.auth(wTextFormFieldEmail.getText(), wTextFormFieldPassword.getText()).then((value){
+                        Connection.auth(wTextFormFieldEmail.getText(),
+                                wTextFormFieldPassword.getText())
+                            .then((value) {
                           Map<String, dynamic> response = jsonDecode(value);
-                          if(response['token'] != null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Sucesso ao logar!"),
-                                  backgroundColor: Colors.green,
-                                )
-                            );
-                            final sharedPreferenceApp = SharedPreferences.getInstance().then((SharedPreferences value) {
-                              value.setString("type", response['type']).then((value) {
+                          if (response['token'] != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text("Sucesso ao logar!"),
+                              backgroundColor: Colors.green,
+                            ));
+                            final sharedPreferenceApp =
+                                SharedPreferences.getInstance()
+                                    .then((SharedPreferences value) {
+                              value
+                                  .setString("type", response['type'])
+                                  .then((value) {
                                 print("Salvou type...");
                               });
-                              value.setString("token", response['token']).then((value) {
+                              value
+                                  .setString("token", response['token'])
+                                  .then((value) {
                                 print("Salvou token...");
                               });
                             });
                             //muda de tela
-                            Navigator.pushNamed(context, '/');
-                          }else{
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Credenciais erradas!"),
-                                  backgroundColor: Colors.red,
-                                )
-                            );
+                            Navigator.pushReplacementNamed(context, '/');
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              content: Text("Credenciais erradas!"),
+                              backgroundColor: Colors.red,
+                            ));
                           }
                         });
                       }

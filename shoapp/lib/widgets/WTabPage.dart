@@ -15,6 +15,7 @@ import 'package:shoapp/connection/Connection.dart';
 import 'package:shoapp/utils/SharedPreferencesApp.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shoapp/widgets/WProfile.dart';
 
 class TabPage extends StatefulWidget {
   @override
@@ -29,6 +30,13 @@ class _TabPageState extends State<TabPage> {
   PageController controller = PageController();
   String title = "";
 
+  /* Campos da página de perfil do usuário */
+  String urlPhoto =
+          "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/271deea8-e28c-41a3-aaf5-2913f5f48be6/de7834s-6515bd40-8b2c-4dc6-a843-5ac1a95a8b55.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzI3MWRlZWE4LWUyOGMtNDFhMy1hYWY1LTI5MTNmNWY0OGJlNlwvZGU3ODM0cy02NTE1YmQ0MC04YjJjLTRkYzYtYTg0My01YWMxYTk1YThiNTUuanBnIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.BopkDn1ptIwbmcKHdAOlYHyAOOACXW0Zfgbs0-6BY-E",
+      name = "Default name",
+      email = "Default email";
+  WTextFormField? wTextFormFieldEmail, wTextFormFieldName;
+
   List<Color> colors = [
     //Color(0xFFEEEEEE),
     Color(0xFFE0E0E0),
@@ -39,25 +47,29 @@ class _TabPageState extends State<TabPage> {
 
   List<Product> products = [
     new Product(
-      url: "https://img.terabyteshop.com.br/produto/g/placa-de-video-palit-nvidia-geforce-rtx-3080ti-gamingpro-12gb-gddr6x-384bit-ned308t019kb-132aa_123399.png",
+        url:
+            "https://img.terabyteshop.com.br/produto/g/placa-de-video-palit-nvidia-geforce-rtx-3080ti-gamingpro-12gb-gddr6x-384bit-ned308t019kb-132aa_123399.png",
         title: "PLACA NVIDIA 5432X",
         desc: "Ideal para seus jogos",
         value: 5899.99,
         favorite: true),
     new Product(
-        url: "https://images.lojanike.com.br/1024x1024/produto/tenis-nike-air-max-2090-masculino-BV9977-800-1.png",
+        url:
+            "https://images.lojanike.com.br/1024x1024/produto/tenis-nike-air-max-2090-masculino-BV9977-800-1.png",
         title: "TÊNIS NIKE AIR PLUS",
         desc: "Mais conforto para seu esporte",
         value: 1359.99,
         favorite: false),
     new Product(
-        url: "https://tecnoblog.net/wp-content/uploads/2020/11/xbox_series_x_produto.png",
+        url:
+            "https://tecnoblog.net/wp-content/uploads/2020/11/xbox_series_x_produto.png",
         title: "XBOX MAX",
         desc: "Mais desempenho e qualidade",
         value: 12899.99,
         favorite: true),
     new Product(
-        url: "https://novomundo.vteximg.com.br/arquivos/ids/1115042-500-500/geladeira-refrigerador-electrolux-side-by-side-frost-free-579l-inox-dm84x-220v-50566-0.jpg?v=636512645576830000",
+        url:
+            "https://novomundo.vteximg.com.br/arquivos/ids/1115042-500-500/geladeira-refrigerador-electrolux-side-by-side-frost-free-579l-inox-dm84x-220v-50566-0.jpg?v=636512645576830000",
         title: "Geladeira Electrolux",
         desc: "Gela demais.",
         value: 9999.99,
@@ -69,38 +81,57 @@ class _TabPageState extends State<TabPage> {
   @override
   void initState() {
     super.initState();
-    final sharedPreferenceApp = SharedPreferences.getInstance().then((SharedPreferences value) {
-      final sharedPreferenceApp = SharedPreferences.getInstance().then((SharedPreferences value) {
+    final sharedPreferenceApp =
+        SharedPreferences.getInstance().then((SharedPreferences value) {
+      final sharedPreferenceApp =
+          SharedPreferences.getInstance().then((SharedPreferences value) {
         String type = value.getString("type")!;
         String token = value.getString("token")!;
         /* Busca dados do user logado */
         Connection.me(type, token).then((value) {
-          setState((){
+          setState(() {
             Map<String, dynamic> user = jsonDecode(value);
-            title = "SHOPAPP. Bem vindo(a), ${user['email']}";
+            title = "SHOPAPP. Bem vindo(a), ${user['name']}";
+            urlPhoto = user['picture'];
+            name = user['name'];
+            email = user['email'];
+            print("xxxxxxxxxxxxxxxxxxxxxxx ${user}");
+            wTextFormFieldEmail = WTextFormField(
+              label: "Email",
+              icon: Icons.alternate_email,
+              keyboardType: TextInputType.text,
+              isActive: false,
+            );
+            wTextFormFieldEmail!.setText(email);
+            wTextFormFieldName = WTextFormField(
+              //hint: "",
+              icon: Icons.drive_file_rename_outline,
+              label: "Nome",
+              keyboardType: TextInputType.text,
+              isActive: false,
+            );
+            wTextFormFieldName!.setText(name);
           });
         });
         /* Busca de produtos */
         Connection.products().then((value) {
           //setState((){
           List productsListAPI = jsonDecode(value);
-            for(var product in productsListAPI){
-                products.add(new Product(
-                    url: product['picture'],
-                    title: product['name'],
-                    desc: product['description'],
-                    value: double.parse(product['value'].toString()),
-
-                    favorite: false
-                ));
-              //print(product['name']);
-            }
+          for (var product in productsListAPI) {
+            products.add(new Product(
+                url: product['picture'],
+                title: product['name'],
+                //desc: product['description'],
+                desc: "Descrição",
+                value: double.parse(product['value'].toString()),
+                favorite: false));
+            //print(product['name']);
+          }
           //});
         });
       });
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -194,12 +225,19 @@ class _TabPageState extends State<TabPage> {
                 padding: const EdgeInsets.only(bottom: 20),
                 child: wRowSearch(),
               ),
+              //WDropDownQuantityPurchase(),
               WText(
                   text: "Mais vendidos",
                   color: Colors.teal,
                   leftPadding: 20,
                   fontHeight: 20),
-              wCardProduct(products, context)
+              wCardProduct(products, context),
+              WText(
+                  text: "Produtos",
+                  color: Colors.teal,
+                  leftPadding: 20,
+                  fontHeight: 20),
+              getWidgetCardProductHorizontal(products),
             ],
           ),
         ]);
@@ -343,35 +381,22 @@ class _TabPageState extends State<TabPage> {
         return WCreditCard();
 
       case 3:
-        return Column(
-          children: [
-            Stack(
-              alignment: AlignmentDirectional.bottomCenter,
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                    width: double.infinity,
-                    height: 200,
-                    child: Text("s"),
-                    decoration: BoxDecoration(
-                      color: Colors.teal,
-                    )),
-                Positioned(
-                  bottom: -80,
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      'https://sooxt98.space/content/images/size/w100/2019/01/profile.png',
-                    ),
-                    radius: 80,
-                  ),
-                )
-              ],
-            )
-          ],
-        );
+        //String name,
+        return WProfile(urlPhoto: urlPhoto, wTextFormFieldEmail: wTextFormFieldEmail!, wTextFormFieldName: wTextFormFieldName!,) ;
+
       default:
         return body;
     }
+  }
+
+  Widget getWidgetCardProductHorizontal(List<Product> products) {
+    return ListView.builder(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemCount: products.length,
+        itemBuilder: (context, index) {
+          return WidgetCardProductHorizontal(product: products[index]);
+        });
   }
 
   Row wRowSearch() {
@@ -448,6 +473,84 @@ class _TabPageState extends State<TabPage> {
       padding: padding,
       icon: icon,
       text: text,
+    );
+  }
+}
+
+class WidgetCardProductHorizontal extends StatelessWidget {
+  Product product;
+
+  WidgetCardProductHorizontal({Key? key, required this.product})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(context, '/product', arguments: product);
+        },
+        child: Container(
+          color: Colors.teal,
+          child: Row(
+            children: [
+              Container(
+                width: 150,
+                color: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: Image.network(
+                      product.url,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Container(
+                    //color: Colors.red,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Text(
+                          product.title,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          product.desc,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Text(
+                          "R\$ ${product.value.toString()}",
+                          style: TextStyle(
+                              color: Colors.amber,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
