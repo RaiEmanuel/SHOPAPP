@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shoapp/widgets/WButton.dart';
 import 'package:shoapp/widgets/WTextFormField.dart';
 
 class WProfile extends StatelessWidget {
@@ -54,26 +55,37 @@ class WProfile extends StatelessWidget {
             ],
           ),
           Padding(
-              padding: const EdgeInsets.only(top: 100),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+            padding: const EdgeInsets.only(top: 100),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flex(
+                  direction: Axis.horizontal,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Flex(
-                      direction: Axis.horizontal,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(child: wTextFormFieldEmail),
-                      ],
-                    ),
-                    Flex(
-                      direction: Axis.horizontal,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(child: wTextFormFieldName),
-                      ],
-                    )
-                  ]))
+                    Expanded(child: wTextFormFieldEmail),
+                  ],
+                ),
+                Flex(
+                  direction: Axis.horizontal,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(child: wTextFormFieldName),
+                  ],
+                ),
+                ElevatedButton(onPressed: (){}, child: Text("s")),
+                WButton(
+                    onTap: (){
+                      Navigator.pushNamed(context, '/map');
+                },
+                  text: "Cadastrar endereço",
+                  width: 250,
+                  icon: Icons.add_location_alt_sharp
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
