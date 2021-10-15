@@ -4,28 +4,31 @@ class WTextFormField extends StatelessWidget {
   final String hint, label;
   final IconData icon;
   final double sizeIcon;
+
   //final String? Function(String?)? validator;
   //TextEditingController _controller = TextEditingController();
   final TextEditingController _controller = TextEditingController();
   final TextInputType keyboardType;
   final bool isPassword, isActive;
+  final Color color;
 
-  WTextFormField({
-    Key? key,
-    this.keyboardType = TextInputType.visiblePassword,
-    this.hint = "Default hint",
-    this.label = "Default label",
-    this.icon = Icons.broken_image_outlined,
-    this.sizeIcon = 15,
-    this.isPassword = false,
-    this.isActive = true
-  }) : super(key: key);
+  WTextFormField(
+      {Key? key,
+      this.keyboardType = TextInputType.visiblePassword,
+      this.hint = "Default hint",
+      this.label = "Default label",
+      this.icon = Icons.broken_image_outlined,
+      this.sizeIcon = 15,
+      this.isPassword = false,
+      this.isActive = true,
+      this.color = Colors.white})
+      : super(key: key);
 
-  String getText(){
+  String getText() {
     return _controller.text;
   }
 
-  void setText(String ? value){
+  void setText(String? value) {
     _controller.text = value!;
   }
 
@@ -38,6 +41,7 @@ class WTextFormField extends StatelessWidget {
       obscureText: isPassword,
       enabled: isActive,
       decoration: new InputDecoration(
+        fillColor: Colors.white,
           border: InputBorder.none,
           focusedBorder: InputBorder.none,
           enabledBorder: InputBorder.none,
@@ -50,7 +54,9 @@ class WTextFormField extends StatelessWidget {
           icon: Padding(
             padding: const EdgeInsets.only(left: 15),
             child: Icon(icon),
-          )),
+          ),
+
+      ),
       validator: (value) {
         if (value!.isEmpty) {
           return "Campo não pode ser vazio!";

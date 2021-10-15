@@ -6,22 +6,11 @@ import './WText.dart';
 Widget wCardProduct(List<Product> products, BuildContext context) {
   return Container(
     height: 350,
-    width: 500,
-    /*child: ListView(
-      shrinkWrap: true,
-      scrollDirection: Axis.horizontal,
-      children: [
-        WCard(products[0]),
-        WCard(products[1]),
-        WCard(products[2]),
-        WCard(products[3]),
-        WCard(products[4]),
-        WCard(products[5]),
-      ],
-    ),*/
+    //width: 500,
     child: ListView.builder(
+      physics: BouncingScrollPhysics(),
       itemCount: products.length,
-      itemBuilder: (context, index){
+      itemBuilder: (context, index) {
         return WCard(products[index]);
       },
       shrinkWrap: true,
@@ -55,7 +44,7 @@ class _WCardState extends State<WCard> {
         child: Stack(
           alignment: AlignmentDirectional.topCenter,
           children: [
-            Positioned(
+            /*Positioned(
               right: 5,
               top: 10,
               child: TextButton(
@@ -70,60 +59,67 @@ class _WCardState extends State<WCard> {
                   });
                 },
               ),
-            ),
-            Column(
-              //coluna geral
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Container(
-                    width: 150,
-                    color: Colors.red,
-                    child: AspectRatio(
-                      aspectRatio: 1,
-                      child: Image.network(
-                        p.url,
-                        fit: BoxFit.contain,
+            ),*/
+            Container(
+              width: 300,
+              child: Column(
+                //coluna geral
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Container(
+                      width: 150,
+                      //color: Colors.red,
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: Image.network(
+                          p.url,
+                          fit: BoxFit.fitWidth,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Column(
-                  //coluna interna
-                  children: [
-                    Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                        child: WText(
-                            text: p.title,
-                            color: Colors.blueGrey,
-                            fontHeight: 20)),
-                    Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                        child: WText(
-                            text: p.desc,
-                            color: Colors.blueGrey,
-                            fontHeight: 16)),
-                    Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                        child: WText(
-                            text: "R\$ ${p.value}",
-                            color: Colors.blueGrey,
-                            fontHeight: 20)),
-                    WButton(
-                      width: 200,
-                      text: "Ver Mais",
-                      p: p,
-                      onTap: () {
-                        Navigator.pushNamed(context, '/product', arguments: p);
-                      },
-                      color: Colors.teal,
-                    ),
-                  ],
-                ),
-              ],
+                  Column(
+                    //coluna interna
+                    children: [
+                      Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          child: WText(
+                              text: p.title,
+                              color: Colors.blueGrey,
+                              fontHeight: 20)),
+                      /*Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          child: Wrap(
+                            children:[WText(
+                                text: p.desc,
+                                color: Colors.blueGrey,
+                                fontHeight: 16),],
+                          ),
+                      ),*/
+                      Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          child: WText(
+                              text: "R\$ ${p.value}",
+                              color: Colors.blueGrey,
+                              fontHeight: 20)),
+                      WButton(
+                        width: 200,
+                        text: "Ver Mais",
+                        p: p,
+                        onTap: () {
+                          Navigator.pushNamed(context, '/product',
+                              arguments: p);
+                        },
+                        color: Colors.teal,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ],
         ));

@@ -20,8 +20,8 @@ class _WFormLoginState extends State<WFormLogin> {
   //final TextEditingController controllerEmail = TextEditingController(),
   //controllerPassword = TextEditingController();
   final WTextFormField wTextFormFieldEmail = WTextFormField(
-    label: "Email",
-    hint: "digite seu e-mail",
+        label: "Email",
+        hint: "digite seu e-mail",
         icon: Icons.person,
         keyboardType: TextInputType.emailAddress,
       ),
@@ -95,31 +95,28 @@ class _WFormLoginState extends State<WFormLogin> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        Connection.auth(wTextFormFieldEmail.getText(),
-                                wTextFormFieldPassword.getText())
-                            .then((value) {
+                        Connection.auth(wTextFormFieldEmail.getText(),wTextFormFieldPassword.getText()).then((value) {
                           Map<String, dynamic> response = jsonDecode(value);
                           if (response['token'] != null) {
+                            print("logou = ${response['token']}");
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text("Sucesso ao logar!"),
                               backgroundColor: Colors.green,
                             ));
                             final sharedPreferenceApp =
-                                SharedPreferences.getInstance()
-                                    .then((SharedPreferences value) {
-                              value
-                                  .setString("type", response['type'])
-                                  .then((value) {
-                                print("Salvou type...");
+                                SharedPreferences.getInstance().then((SharedPreferences value) {
+                              value.setString("type", response['type']).then((value) {
+                                print("Salvou type... ");
                               });
-                              value
-                                  .setString("token", response['token'])
-                                  .then((value) {
+                              String pegou = value.getString("type")!;
+                              print("peogooooooou = ===== ${pegou}");
+                              value.setString("token", response['token']).then((value) {
                                 print("Salvou token...");
                               });
                             });
                             //muda de tela
-                            Navigator.pushReplacementNamed(context, '/');
+                            //Navigator.pushReplacementNamed(context, '/');
+                            Navigator.pushNamed(context, '/');
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               content: Text("Credenciais erradas!"),

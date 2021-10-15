@@ -1,13 +1,12 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'Product.dart';
+import 'package:shoapp/PurchasedProduct.dart';
 
-class CartModel extends ChangeNotifier {
-  final List<Product> _productsList = [];
+class PCartModel extends ChangeNotifier {
+  final List<PurchasedProduct> _productsList = [];
 
-  UnmodifiableListView<Product> get products =>
+  UnmodifiableListView<PurchasedProduct> get products =>
       UnmodifiableListView(_productsList);
-
   double totalPrice = 0;
 
   int getQuantity() {
@@ -19,20 +18,29 @@ class CartModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void remove(Product product) {
+  void remove(PurchasedProduct product) {
     _productsList.remove(product);
     totalPrice -= product.value;
     notifyListeners();
   }
 
-  void add(Product product) {
-    if(!_productsList.contains(product)){
-      _productsList.add(product);
-      totalPrice += product.value;
-      // This call tells the widgets that are listening to this model to rebuild.
-      notifyListeners();
+  bool add(PurchasedProduct product) {
+    for(PurchasedProduct p in _productsList){
+      if(p.id == product.id){//duplicado
+        return false;
+      }
     }
+    print("nao tem");
+    _productsList.add(product);
+    totalPrice += product.value;
+    // This call tells the widgets that are listening to this model to rebuild.
+    notifyListeners();
+    return true;
+    //if(!_productsList.contains(product)){
 
+      //return true;
+    //}
+    //return false;
   }
 
   /// Removes all items from the cart.

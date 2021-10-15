@@ -74,15 +74,17 @@ class WProfile extends StatelessWidget {
                     Expanded(child: wTextFormFieldName),
                   ],
                 ),
-                ElevatedButton(onPressed: (){}, child: Text("s")),
-                WButton(
-                    onTap: (){
-                      Navigator.pushNamed(context, '/map');
-                },
-                  text: "Cadastrar endereço",
-                  width: 250,
-                  icon: Icons.add_location_alt_sharp
-                ),
+                SizedBox(height: 20,),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: WButton(
+                    text: "Ver minhas compras",
+                    width: MediaQuery.of(context).size.width,
+                    onTap: () {
+                      Navigator.pushNamed(context, "/mypurchases");
+                    },
+                  ),
+                )
               ],
             ),
           ),

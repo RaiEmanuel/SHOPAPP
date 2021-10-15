@@ -1,12 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:shoapp/Product.dart';
+import 'package:shoapp/PurchasedProduct.dart';
 import 'package:shoapp/widgets/WButton.dart';
 import 'package:provider/provider.dart';
-import '../PCartModel.dart';
+import 'package:shoapp/pCartModel.dart';
 import 'package:shoapp/connection/connection.dart';
 
 class RouteProduct extends StatelessWidget {
-  const RouteProduct({Key? key}) : super(key: key);
+  RouteProduct({Key? key}) : super(key: key);
+
+  Color selectedColor = Colors.white;
+  int indexSelectedColor = 0;//0 - invalid
+  List<WidgetColorSelector> colors = [
+    WidgetColorSelector(
+      onTap: () {
+        print("[[[[[[[[[[[[[preto]]]]]]]]]]]]");
+        //selectedColor = Colors.black;
+      },
+      color: Colors.black,
+    ),
+    WidgetColorSelector(
+      onTap: () {
+        print("[[[[[[[[[[[[[azul]]]]]]]]]]]]");
+      },
+      color: Colors.blueAccent,
+    ),
+    WidgetColorSelector(
+      onTap: () {
+        print("[[[[[[[[[[[[[verde]]]]]]]]]]]]");
+      },
+      color: Colors.greenAccent,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -15,233 +40,234 @@ class RouteProduct extends StatelessWidget {
     /* ID da cor no banco é selecionada */
     int selectedColor = 0;
     return Scaffold(
-        extendBodyBehindAppBar: true,
-        appBar: AppBar(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            iconSize: 30,
-            onPressed: () {
-              print("Voltou");
-              Navigator.pop(context);
-            },
-          ),
-          /*GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Icon(
-                Icons.arrow_back_ios,
-                color: Colors.white,
-                size: 35,
-              ),
-            ),
-          ),*/
-          actions: [
-            /*Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Icon(
-                Icons.favorite,
-                color: Colors.white,
-                size: 35,
-              ),
-            )*/
-            IconButton(
-              onPressed: () {
-                print("Favoritou");
-              },
-              icon: Icon(Icons.favorite),
-              iconSize: 30,
-            ),
-          ],
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Text("Produto"),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          iconSize: 30,
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        bottomNavigationBar: Container(
-          color: Colors.teal,
-          height: 80,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 0),
-                child: Text(
-                  "R\$ ${product.value.toString()}",
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+        actions: [
+          IconButton(
+            onPressed: () {
+              print("Favoritou");
+            },
+            icon: Icon(Icons.favorite),
+            iconSize: 30,
+          ),
+        ],
+      ),
+      //backgroundColor: Colors.teal,
+      bottomNavigationBar: Container(
+        color: Colors.teal,
+        height: 80,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 0),
+              child: Text(
+                "R\$ ${product.value.toString()}",
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
-              WButton(
-                width: 200,
-                height: 50,
-                text: "Comprar",
-                icon: Icons.shopping_cart,
-                onTap: () {
-                  /*Connection.getAttr().then((value){
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
-                  });*/
-                  //var v = Connection.getAttr();
-                  //ScaffoldMessenger.of(context)
-                      //.showSnackBar(SnackBar(content: Text(v.toString())));
+            ),
+            WButton(
+              width: 200,
+              height: 50,
+              text: "Comprar",
+              icon: Icons.shopping_cart,
+              onTap: () {
+                var cart = Provider.of<PCartModel>(context, listen: false);
+                //Provider.of<CartModel>(context, listen: false)
+                PurchasedProduct purchasedProduct = PurchasedProduct(
+                    id: product.id,
+                    url: product.url,
+                    title: product.title,
+                    desc: product.desc,
+                  favorite: product.favorite,
+                  value: product.value,
+                  colors: [1],
+                  quantity: 3
+                );
+                print(purchasedProduct.id);
 
-                  var cart = Provider.of<CartModel>(context, listen: false);
-                  //Provider.of<CartModel>(context, listen: false)
-                  cart.add(product);
-                  print(cart.getQuantity());
-                  //c.add(Product("d","dd","ddd",10,true));
-                },
-                color: Colors.white,
-                colorIcon: Colors.teal,
-                colorText: Colors.teal,
-              ),
-              /*Consumer<CartModel>(
+                if (cart.add(purchasedProduct)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.teal,
+                      content: Text(
+                          "Produto ${product.title} adicionado com sucesso!"),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      backgroundColor: Colors.red,
+                      content:
+                          Text("Produto ${product.title} já está no carrinho!"),
+                    ),
+                  );
+                }
+                print(cart.getQuantity());
+
+                //c.add(Product("d","dd","ddd",10,true));
+              },
+              color: Colors.white,
+              colorIcon: Colors.teal,
+              colorText: Colors.teal,
+            ),
+            /*Consumer<CartModel>(
                   builder: (_, cart, __) =>
                       Text("${cart.getQuantity().toString()}")),*/
-            ],
-          ),
+          ],
         ),
-        body: Column(children: [
+      ),
+      body: ListView(
+        //physics: NeverScrollableScrollPhysics(),
+        physics: BouncingScrollPhysics(),
+        //physics: RangeMaintainingScrollPhysics(),
+        shrinkWrap: true,
+        padding: EdgeInsets.zero,
+        children: [
           Stack(
             alignment: AlignmentDirectional.bottomCenter,
             clipBehavior: Clip.none,
             children: [
               Container(
-                width: double.infinity,
+                width: MediaQuery.of(context).size.width,
                 height: 300,
                 color: Colors.teal,
               ),
               Positioned(
                 bottom: -150,
                 child: Container(
-                  width: 150,
+                  //width: MediaQuery.of(context).size.width,
+                  height: 300,
+                  //color: Colors.greenAccent,
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: Image.network(
                       product.url.toString(),
+                      fit: BoxFit.scaleDown,
                     ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
           Container(
-              width: MediaQuery.of(context).size.width,
-              //height: 899,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 200, left: 20, right: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Row(
-                      //linha do titulo
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width / 2,
-                          height: 120,
-                          child: Text(
-                            //titulo do produto
-                            product.title.toString(),
-                            style: TextStyle(
-                                fontSize: 26, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        WDropDownQuantityPurchase()
-                      ],
-                    ),
-                    Column(
-                      //linha do titulo
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: MediaQuery.of(context).size.width / 2,
-                          child: Text(
-                            //titulo do produto
-                            "Cores",
-                            style: TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            //ColorSelector(),
-                            /* componentizar */
-                            GestureDetector(
-                              onTap: () {
-                                print("Sou Roxo");
-                                selectedColor = 0;
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(100),
-                                    color: Colors.deepPurple,
-                                  ),
-                                  width: 25,
-                                  height: 25,
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                print("Sou Azul");
-                                selectedColor = 1;
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(100),
-                                    color: Colors.blue,
-                                  ),
-                                  width: 25,
-                                  height: 25,
-                                ),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                print("Sou Rosa");
-                                selectedColor = 2;
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(100),
-                                    color: Colors.pinkAccent,
-                                  ),
-                                  width: 25,
-                                  height: 25,
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
+            //color: Colors.greenAccent,
+            width: MediaQuery.of(context).size.width,
+            //height: 899,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 180, left: 20, right: 20),
+              child: Column(
+                //coluna de informações
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Container(
+                    //color: Colors.greenAccent,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
                       child: Text(
-                        product.desc.toString(),
+                        //titulo do produto
+                        product.title.toString(),
                         style: TextStyle(
-                          fontSize: 20,
-                        ),
+                            fontSize: 26, fontWeight: FontWeight.bold),
                       ),
                     ),
-                  ],
-                ),
-              )),
-        ]));
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Column(
+                    //coluna das informações restantes
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              //titulo do produto
+                              "Cores e quantidade",
+                              style: TextStyle(
+                                  fontSize: 22, fontWeight: FontWeight.bold),
+                            ),
+                            flex: 8,
+                          ),
+                          Expanded(
+                            child: Container(height: 30, color: Colors.red),
+                            flex: 2,
+                          )
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          //ColorSelector(),
+                          /* componentizar */
+                          Expanded(
+                            child: Container(
+                              //color: Colors.greenAccent,
+                              child: Row(
+                                children: colors,
+                              ),
+                            ),
+                            //flex: 5,
+                          ),
+                          WDropDownQuantityPurchase(),
+                        ],
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  //---------------- descrição
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      product.desc.toString(),
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  //---------------- Avaliações
+                  WButton(
+                    onTap: () {
+                      Navigator.pushNamed(context, '/feedback', arguments: product);
+                    },
+                    width: MediaQuery.of(context).size.width,
+                    icon: Icons.feedback,
+                    text: "Ver Feedback do produto",
+                  ),
+                  //Container(width: MediaQuery.of(context).size.width,color: Colors.greenAccent,child: Expanded(child: Text("ssss"))),
+                  SizedBox(
+                    height: 20,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -303,11 +329,11 @@ class WDropDownQuantityPurchase extends StatefulWidget {
 
 /// This is the private State class that goes with MyStatefulWidget.
 class _WDropDownQuantityPurchaseState extends State<WDropDownQuantityPurchase> {
-  String dropdownValue = '1';
+  int dropdownValue = 1;
 
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<String>(
+    return DropdownButton<int>(
       value: dropdownValue,
       icon: const Icon(
         Icons.arrow_downward,
@@ -319,18 +345,49 @@ class _WDropDownQuantityPurchaseState extends State<WDropDownQuantityPurchase> {
         height: 2,
         color: Colors.teal,
       ),
-      onChanged: (String? newValue) {
+      onChanged: (int ? newValue) {
         setState(() {
           dropdownValue = newValue!;
         });
       },
-      items: <String>['1', '2', '3', '4']
-          .map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
+      items: <int>[1,2,3,4]
+          .map<DropdownMenuItem<int>>((int value) {
+        return DropdownMenuItem<int>(
           value: value,
           child: (value == '1' ? Text('$value item') : Text('$value itens')),
         );
       }).toList(),
+    );
+  }
+}
+
+class WidgetColorSelector extends StatefulWidget {
+  Function()? onTap = () {};
+  Color color;
+
+  WidgetColorSelector({Key? key, this.onTap, this.color = Colors.blueAccent})
+      : super(key: key);
+
+  @override
+  _WidgetColorSelectorState createState() => _WidgetColorSelectorState();
+}
+
+class _WidgetColorSelectorState extends State<WidgetColorSelector> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            color: widget.color,
+          ),
+          width: 25,
+          height: 25,
+        ),
+      ),
     );
   }
 }
