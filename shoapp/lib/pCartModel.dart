@@ -50,4 +50,19 @@ class PCartModel extends ChangeNotifier {
     // This call tells the widgets that are listening to this model to rebuild.
     notifyListeners();
   }
+
+  Color getColor(int index){
+    int idColor = _productsList[index].colors[0];
+    switch(idColor){
+      case 2:
+        return Colors.black;
+      case 3:
+        return Colors.blueAccent;
+      case 4:
+        return Colors.redAccent;
+      case 6:
+        return Colors.grey;
+    }
+    return Colors.black;
+  }
 }

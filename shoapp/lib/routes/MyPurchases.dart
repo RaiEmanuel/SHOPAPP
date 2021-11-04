@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:shoapp/Address.dart';
 import 'package:shoapp/connection/Connection.dart';
+import 'package:shoapp/utils/SharedPreferencesApp.dart';
+
+import '../main.dart';
 
 class RouteMyPuchases extends StatefulWidget {
   const RouteMyPuchases({Key? key}) : super(key: key);
@@ -24,6 +26,17 @@ class _RouteMyPuchasesState extends State<RouteMyPuchases> {
   Address? address;
   List<dynamic> listPurchases = [];
 
+  //SharedPreferencesApp sharedPreferencesApp = SharedPreferencesApp();
+
+  initAsync() async {
+    String token = "";
+    token = await UserSecureStorage.getToken();
+    String purchasesJson = await Connection.getAllPurchases("bearer", token);
+    setState(() {
+      listPurchases = jsonDecode(purchasesJson);
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -32,13 +45,7 @@ class _RouteMyPuchasesState extends State<RouteMyPuchases> {
     setState(() {
       _target = LatLng(-5.659460, -37.800060);
     });
-    Connection.getAllPurchases().then(
-          (value) {
-        setState(() {
-          listPurchases = jsonDecode(value);
-        });
-      },
-    );
+    initAsync();
   }
 
   Future<List<Placemark>> getAddress(LatLng latlng) async {
@@ -71,59 +78,13 @@ class _RouteMyPuchasesState extends State<RouteMyPuchases> {
         padding: const EdgeInsets.only(top: 100),
         child: Column(
           children: [
-            /*ElevatedButton(
-                onPressed: () {
-                  Connection.getAllPurchases().then(
-                    (value) {
-                      setState(() {
-                        listPurchases = jsonDecode(value);
-                      });
-                    },
-                  );
-                },
-                child: Text("get")),*/
-            /*Container(
-              width: double.infinity,
-              height: 500,
-              color: Colors.teal,
-              child: Column(
-                children: [
-                  Container(
-                    height: 480,
-                    width: double.infinity,
-                    //color: Colors.greenAccent,
-                    child: ListView.builder(
-                      itemCount: locais.length,
-                      scrollDirection: Axis.vertical,
-                      physics: BouncingScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return Column(
-                          children: [
-                            ListTile(
-                              title: Text(locais[index].street!),
-                              subtitle: Text(locais[index].name!),
-                              leading: Icon(Icons.satellite),
-
-                              //
-                              trailing: Icon(Icons.location_on),
-                              onTap: () {
-
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),*/
             Container(
               height: 350,
               color: Colors.greenAccent,
               width: MediaQuery.of(context).size.width,
               child: ListView.builder(
                 itemCount: listPurchases.length,
+                physics: BouncingScrollPhysics(),
                 itemBuilder: (context, index) {
                   //return Container(child: Text(listPurchases[index]['name']));
                   return ListTile(
@@ -136,13 +97,13 @@ class _RouteMyPuchasesState extends State<RouteMyPuchases> {
                         _movimentarCamera();
                       });
                     },
-                    title: (listPurchases[index]['street'] == null)
-                        ? Text("Desconhecido")
-                        : Text(listPurchases[index]['street']),
-                    subtitle: (listPurchases[index]['street'] == null)
-                        ? Text("Desconhecido")
-                        : Text(
-                            "${listPurchases[index]['latitude']}, ${listPurchases[index]['longitude']}"),
+                    leading: Icon(Icons.shopping_cart,color: Colors.teal,),
+                    trailing: IconButton(
+                      onPressed: (){},
+                      icon: Icon(Icons.remove_red_eye),
+                    ),
+                    title: (listPurchases[index]['id'] != null)? Text("Compra - ${listPurchases[index]['id']}") : Text("Desconhecido"),
+                    subtitle: (listPurchases[index]['street'] != null)? Text("${listPurchases[index]['street']}") : Text("Desconhecido"),
                   );
                 },
               ),

@@ -1,31 +1,23 @@
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:line_icons/line_icon.dart';
-import 'package:shoapp/PCartModel.dart';
-import 'package:shoapp/PurchasedProduct.dart';
+import 'package:shoapp/utils/SharedPreferencesApp.dart';
 import 'package:shoapp/widgets/WTextFormField.dart';
 import '../Product.dart';
 import 'WCardproduct.dart';
 import './WText.dart';
-import 'WCreditCard.dart';
 import 'WButton.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:lottie/lottie.dart';
 import 'package:shoapp/connection/Connection.dart';
-import 'package:shoapp/utils/SharedPreferencesApp.dart';
 import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shoapp/widgets/WProfile.dart';
 import 'package:shoapp/Address.dart';
 import 'package:flutter_credit_card/credit_card_form.dart';
 import 'package:flutter_credit_card/credit_card_model.dart';
 import 'package:flutter_credit_card/flutter_credit_card.dart';
 import 'package:shoapp/widgets/WButton.dart';
-import 'package:shoapp/Address.dart';
 import 'package:shoapp/pCartModel.dart' as MyCart;
-import 'package:shoapp/connection/Connection.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -57,106 +49,58 @@ class _TabPageState extends State<TabPage> {
     Color(0xFFE0E0E0)
   ];
 
-  List<Product> products = [
-    /*new Product(
-        id: 123,
-        url:
-            "https://img.terabyteshop.com.br/produto/g/placa-de-video-palit-nvidia-geforce-rtx-3080ti-gamingpro-12gb-gddr6x-384bit-ned308t019kb-132aa_123399.png",
-        title: "PLACA NVIDIA 5432X",
-        desc: "Ideal para seus jogos",
-        value: 5899.99,
-        favorite: true),
-    new Product(
-        id: 123,
-        url:
-            "https://images.lojanike.com.br/1024x1024/produto/tenis-nike-air-max-2090-masculino-BV9977-800-1.png",
-        title: "TÊNIS NIKE AIR PLUS",
-        desc: "Mais conforto para seu esporte",
-        value: 1359.99,
-        favorite: false),
-    new Product(
-        id: 123,
-        url:
-            "https://tecnoblog.net/wp-content/uploads/2020/11/xbox_series_x_produto.png",
-        title: "XBOX MAX",
-        desc: "Mais desempenho e qualidade",
-        value: 12899.99,
-        favorite: true),
-    new Product(
-        id: 123,
-        url:
-            "https://novomundo.vteximg.com.br/arquivos/ids/1115042-500-500/geladeira-refrigerador-electrolux-side-by-side-frost-free-579l-inox-dm84x-220v-50566-0.jpg?v=636512645576830000",
-        title: "Geladeira Electrolux",
-        desc: "Gela demais.",
-        value: 9999.99,
-        favorite: false),*/
-  ];
+  List<Product> products = [];
 
-  //SharedPreferencesApp s = SharedPreferencesApp();
+  void initAsync() async {
+    String token = await UserSecureStorage.getToken();
+    //traz dados pessoais
+    String meJson = await Connection.me("bearer", token);
+    setState(() {
+      Map<String, dynamic> user = jsonDecode(meJson);
+      title = "SHOPAPP. Bem vindo(a), ${user['name']}";
+      urlPhoto = user['picture'];
+      name = user['name'];
+      email = user['email'];
+      print(" user logado xxxxxxxxxxxxxxxxxxxxxxx ${user}");
+      /* traz produtos */
+    });
+    String productsJson = await Connection.products();
+    List productsListAPI = jsonDecode(productsJson);
+    setState(() {
+        for (var product in productsListAPI) {
+          products.add(new Product(
+              id: int.parse(product['id'].toString()),
+              url: product['picture'],
+              title: product['name'],
+              desc: product['description'],
+              //desc: "Descrição",
+              value: double.parse(product['value'].toString()),
+              favorite: false));
+        }
+      },
+    );
+  }
 
   @override
   void initState() {
     super.initState();
-    final sharedPreferenceApp = SharedPreferences.getInstance().then(
-      (SharedPreferences value) {
-        final sharedPreferenceApp = SharedPreferences.getInstance().then(
-          (SharedPreferences value) {
-            String type = value.getString("type")!;
-            String token = value.getString("token")!;
-            /* Busca dados do user logado */
-            Connection.me(type, token).then((value) {
-              setState(() {
-                Map<String, dynamic> user = jsonDecode(value);
-                title = "SHOPAPP. Bem vindo(a), ${user['name']}";
-                urlPhoto = user['picture'];
-                name = user['name'];
-                email = user['email'];
-                print("xxxxxxxxxxxxxxxxxxxxxxx ${user}");
-                wTextFormFieldEmail = WTextFormField(
-                  label: "Email",
-                  icon: Icons.alternate_email,
-                  keyboardType: TextInputType.text,
-                  isActive: false,
-                );
-                wTextFormFieldEmail!.setText(email);
-                wTextFormFieldName = WTextFormField(
-                  //hint: "",
-                  icon: Icons.drive_file_rename_outline,
-                  label: "Nome",
-                  keyboardType: TextInputType.text,
-                  isActive: false,
-                );
-                wTextFormFieldName!.setText(name);
-              });
-            });
-            /* Busca de produtos */
-            Connection.products().then(
-              (value) {
-                //setState((){
-                List productsListAPI = jsonDecode(value);
-                setState(
-                  () {
-                    for (var product in productsListAPI) {
-                      products.add(new Product(
-                          id: int.parse(product['id'].toString()),
-                          url: product['picture'],
-                          title: product['name'],
-                          desc: product['description'],
-                          //desc: "Descrição",
-                          value: double.parse(product['value'].toString()),
-                          favorite: false));
-                      //print(product['name']);
-                    }
-                  },
-                );
-
-                //});
-              },
-            );
-          },
-        );
-      },
+    initAsync();
+    /* Inicializa campos do perfil */
+    wTextFormFieldEmail = WTextFormField(
+      label: "Email",
+      icon: Icons.alternate_email,
+      keyboardType: TextInputType.text,
+      isActive: false,
     );
+    wTextFormFieldEmail!.setText(email);
+    wTextFormFieldName = WTextFormField(
+      //hint: "",
+      icon: Icons.drive_file_rename_outline,
+      label: "Nome",
+      keyboardType: TextInputType.text,
+      isActive: false,
+    );
+    wTextFormFieldName!.setText(name);
   }
 
   @override
@@ -273,11 +217,6 @@ class _TabPageState extends State<TabPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 20),
                   child: wRowSearch(),
                 ),
-                /*Padding(
-                  padding: const EdgeInsets.only(bottom: 20),
-                  child: wRowSearch(),
-                ),*/
-                //WDropDownQuantityPurchase(),
                 SizedBox(
                   height: 20,
                 ),
@@ -391,20 +330,21 @@ class _TabPageState extends State<TabPage> {
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 18,
-                                      fontWeight: FontWeight.bold
-                                  ),
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                    "Quantidade: ${cart.products[index].quantity.toString()}",
+                                  "Quantidade: ${cart.products[index].quantity.toString()}",
                                   style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14,
+                                    color: Colors.white,
+                                    fontSize: 14,
                                   ),
                                 ),
-                                Text(
-                                    "Cor: ${cart.products[index].colors.toString()}",
-
-                                ),
+                                //o que importa é a cor
+                                WidgetColorSelector(
+                                    colorAPI: ColorAPI(
+                                        id: 0,
+                                        color: cart.products[index].getColor(),
+                                        name: "default"))
                               ],
                             ),
                           ),
@@ -414,7 +354,7 @@ class _TabPageState extends State<TabPage> {
                           flex: 2,
                           child: Container(
                             color: Colors.redAccent,
-                              child: Icon(Icons.delete,color:Colors.white),
+                            child: Icon(Icons.delete, color: Colors.white),
                           ),
                         )
                       ],
@@ -670,11 +610,7 @@ class _TabPageState extends State<TabPage> {
   }
 }
 
-void getCredentials(String type, String token) async {
-  final sharedPreferenceApp = await SharedPreferences.getInstance();
-  type = await sharedPreferenceApp.getString("type")!;
-  token = await sharedPreferenceApp.getString("token")!;
-}
+void getCredentials(String type, String token) async {}
 
 class WidgetCardProductHorizontal extends StatelessWidget {
   Product product;
@@ -722,7 +658,9 @@ class WidgetCardProductHorizontal extends StatelessWidget {
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Visby"
+                          ),
                         ),
                         Text(
                           product.desc,
@@ -776,14 +714,14 @@ class WCreditCardState extends State<WCreditCard> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   bool selectedAddress = false;
 
+  //SharedPreferencesApp sharedPreferencesApp = SharedPreferencesApp();
+
   void buy(MyCart.PCartModel cart, Address address) async {
-    final sharedPreferenceApp = await SharedPreferences.getInstance();
-    String? type = await sharedPreferenceApp.getString("type")!;
-    String? token = await sharedPreferenceApp.getString("token")!;
+    String token = await UserSecureStorage.getToken();
     if (cart.getQuantity() > 0) {
       //compra
       Connection.purchase(
-              type,
+              "bearer",
               token,
               cart.products,
               Address(
@@ -791,14 +729,12 @@ class WCreditCardState extends State<WCreditCard> {
                   longitude: address.longitude,
                   street: address.street))
           .then((value) {
-        //print("salvou no bancoooooooo $value");
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             backgroundColor: Colors.greenAccent[700],
             content: Text("Compra efetuada com sucesso!")));
       });
       cart.removeAll();
     } else {
-      //print("zeradooooooooooooooooooooooooo");
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           backgroundColor: Colors.red,
           content: Text("Não há itens no carrinho!")));
@@ -960,4 +896,44 @@ class Produto {
         titulo = json['title'],
         categoria = json['category'],
         preco = json['price'];
+}
+
+/* ********************************* */
+class ColorAPI {
+  int id;
+  String name;
+  Color color;
+
+  ColorAPI({required this.id, required this.name, required this.color});
+}
+
+class WidgetColorSelector extends StatefulWidget {
+  Function()? onTap = () {};
+  ColorAPI colorAPI;
+
+  WidgetColorSelector({Key? key, this.onTap, required this.colorAPI})
+      : super(key: key);
+
+  @override
+  _WidgetColorSelectorState createState() => _WidgetColorSelectorState();
+}
+
+class _WidgetColorSelectorState extends State<WidgetColorSelector> {
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(100),
+            color: widget.colorAPI.color,
+          ),
+          width: 25,
+          height: 25,
+        ),
+      ),
+    );
+  }
 }

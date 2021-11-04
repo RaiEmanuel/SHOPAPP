@@ -2,19 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:shoapp/widgets/WButton.dart';
 import '../Product.dart';
 import './WText.dart';
+import 'package:shoapp/connection/Connection.dart';
 
 Widget wCardProduct(List<Product> products, BuildContext context) {
   return Container(
-    height: 350,
-    //width: 500,
-    child: ListView.builder(
-      physics: BouncingScrollPhysics(),
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return WCard(products[index]);
+    height: 400,
+    child: FutureBuilder(
+      future: Connection.products(),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.connectionState != ConnectionState.done)
+          return Container(
+            height: 300,
+            child: Text("carregando"),
+          );
+        if (snapshot.hasError) return Text("deu uma falhada");
+        if (!snapshot.hasData) return Text("zerado");
+        return ListView.builder(
+          physics: BouncingScrollPhysics(),
+          itemCount: products.length,
+          itemBuilder: (context, index) {
+            return WCard(products[index]);
+          },
+          shrinkWrap: true,
+          scrollDirection: Axis.horizontal,
+        );
       },
-      shrinkWrap: true,
-      scrollDirection: Axis.horizontal,
     ),
   );
 }
@@ -38,28 +50,79 @@ class _WCardState extends State<WCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
+      width: 300,
+      height: 500,
+      color: Colors.white,
+      margin: EdgeInsets.only(right: 20),
+      child: SingleChildScrollView(
+        physics: BouncingScrollPhysics(),
+        scrollDirection: Axis.vertical,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+                width: 250,
+                //height: 200,
+                //color: Colors.greenAccent,
+                child: AspectRatio(
+                  aspectRatio: 1,
+                  child: Image.network(
+                    p.url,
+                    fit: BoxFit.scaleDown,
+                  ),
+                )),
+            SizedBox(
+              height: 10,
+            ),
+            Align(
+              child: Text(
+                p.title,
+                style: TextStyle(
+                  fontFamily: "VisbyExtraBold",
+                  fontSize: 20,
+                ),
+              ),
+              alignment: Alignment.center,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 25.0),
+              child: Flex(
+                direction: Axis.horizontal,
+                children: [
+                  Flexible(
+                    child: Text(
+                      "R\$ ${p.value.toString()}",
+                      style: TextStyle(
+                        fontFamily: "Visby",
+                        fontSize: 25,
+                        color: Colors.amber
+                      ),
+                    ),
+                    flex: 8,
+                    fit: FlexFit.tight,
+                  ),
+                  Flexible(
+                      child: IconButton(
+                        onPressed: (){},
+                        icon: Icon(Icons.favorite_border),
+                      ),
+                      flex: 2,
+                      fit: FlexFit.tight,
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+    /*Card(
         color: Colors.white70,
-        shadowColor: Colors.black26,
+        //shadowColor: Colors.black26,
         child: Stack(
           alignment: AlignmentDirectional.topCenter,
           children: [
-            /*Positioned(
-              right: 5,
-              top: 10,
-              child: TextButton(
-                child: Icon(
-                  isFavorite ? Icons.favorite : Icons.favorite_border,
-                  color: Colors.purple,
-                ),
-                onPressed: () {
-                  setState(() {
-                    p.favorite = !p.favorite;
-                    isFavorite = !isFavorite;
-                  });
-                },
-              ),
-            ),*/
             Container(
               width: 300,
               child: Column(
@@ -122,6 +185,7 @@ class _WCardState extends State<WCard> {
               ),
             ),
           ],
-        ));
+        ),
+    );*/
   }
 }

@@ -1,39 +1,20 @@
-import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class SharedPreferencesApp{
-  //falta bool e list string para tipos - SET
-  static Future<SharedPreferences> _futureSharedPreferenceApp = SharedPreferences.getInstance();
+class UserSecureStorage {
+  static final _storage = FlutterSecureStorage();
 
-  /* CORRIGIR FORMA DE IMPLEMENTAÇÃO PARA APENAS UMA INICIALIZAÇÃO */
+  static const _keyType = 'type';
+  static const _keyToken = 'token';
 
-  static Future<void> setValueInt(String key, int value) async{
-    final SharedPreferences _sharedPreferencesApp = await _futureSharedPreferenceApp;
-    _sharedPreferencesApp.setInt(key, value);
-  }
+  static Future setType(String type) async =>
+      await _storage.write(key: _keyType, value: type);
 
-  static Future<void> setValueString(String key, String value) async{
-    final SharedPreferences _sharedPreferencesApp = await _futureSharedPreferenceApp;
-    await _sharedPreferencesApp.setString(key, value);
-    if(_sharedPreferencesApp.containsKey(key)){
-      String pegou = _sharedPreferencesApp.getString(key)!;
-      print("pegou ===== ${pegou}");
-    }
-    print("set contains ================= ${_sharedPreferencesApp.containsKey(key)} == ${value}");
-  }
+  static Future<String> getType() async =>
+      await _storage.read(key: _keyType) ?? "Type void";
 
-  static Future<void> setValueDouble(String key, double value) async{
-    final SharedPreferences _sharedPreferencesApp = await _futureSharedPreferenceApp;
-    _sharedPreferencesApp.setDouble(key, value);
-  }
+  static Future setToken(String token) async =>
+      await _storage.write(key: _keyToken, value: token);
 
-  //falta bool e list string para tipos - GET
-
-  static Future<String> getValueString(String key) async {
-    final SharedPreferences _sharedPreferencesApp = await _futureSharedPreferenceApp;
-    String s = await (_sharedPreferencesApp.getString(key) ?? "default");
-    print("get contains ================= ${_sharedPreferencesApp.containsKey(key)} == ${key}");
-    return s;
-  }
-
+  static Future<String> getToken() async =>
+      await _storage.read(key: _keyToken) ?? "Token void";
 }

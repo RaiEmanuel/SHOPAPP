@@ -4,41 +4,76 @@ import 'package:shoapp/PurchasedProduct.dart';
 import 'package:shoapp/widgets/WButton.dart';
 import 'package:provider/provider.dart';
 import 'package:shoapp/pCartModel.dart';
-import 'package:shoapp/connection/connection.dart';
 
-class RouteProduct extends StatelessWidget {
-  RouteProduct({Key? key}) : super(key: key);
+class RouteProduct extends StatefulWidget {
+  const RouteProduct({Key? key}) : super(key: key);
+  @override
+  _RouteProductState createState() => _RouteProductState();
+}
 
-  Color selectedColor = Colors.white;
-  int indexSelectedColor = 0;//0 - invalid
-  List<WidgetColorSelector> colors = [
-    WidgetColorSelector(
-      onTap: () {
-        print("[[[[[[[[[[[[[preto]]]]]]]]]]]]");
-        //selectedColor = Colors.black;
-      },
-      color: Colors.black,
-    ),
-    WidgetColorSelector(
-      onTap: () {
-        print("[[[[[[[[[[[[[azul]]]]]]]]]]]]");
-      },
-      color: Colors.blueAccent,
-    ),
-    WidgetColorSelector(
-      onTap: () {
-        print("[[[[[[[[[[[[[verde]]]]]]]]]]]]");
-      },
-      color: Colors.greenAccent,
-    ),
-  ];
+class _RouteProductState extends State<RouteProduct> {
+  ColorAPI selectedColor = ColorAPI(id: 2, name: "Preto", color: Colors.black);
+  //int indexSelectedColor = 1; //0 - invalid
+
+  //dropdown de pegar a quantidae
+  WDropDownQuantityPurchase dropDownQuantity = WDropDownQuantityPurchase(
+    selectedQuantity: 1,
+  );
+  List<WidgetColorSelector> colors = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    /****** simulando que as cores vieram da api *****/
+    colors.add(
+      WidgetColorSelector(
+        colorAPI: ColorAPI(id: 2, name: "Preto", color: Colors.black),
+        onTap: () {
+          setState(() {
+            selectedColor = ColorAPI(id: 2, name: "Preto", color: Colors.black);
+          });
+        },
+      ),
+    );
+    colors.add(
+      WidgetColorSelector(
+        colorAPI: ColorAPI(id: 3, name: "Azul", color: Colors.blueAccent),
+        onTap: () {
+          setState(() {
+            selectedColor =  ColorAPI(id: 3, name: "Azul", color: Colors.blueAccent);
+          });
+        },
+      ),
+    );
+    colors.add(
+      WidgetColorSelector(
+        colorAPI: ColorAPI(id: 6, name: "Azul", color: Colors.grey),
+        onTap: () {
+          setState(() {
+            selectedColor = ColorAPI(id: 6, name: "Azul", color: Colors.grey);
+          });
+        },
+      ),
+    );
+    colors.add(
+      WidgetColorSelector(
+        colorAPI: ColorAPI(id: 4, name: "Vermelho", color: Colors.redAccent),
+        onTap: () {
+          setState(() {
+            selectedColor = ColorAPI(id: 4, name: "Vermelho", color: Colors.redAccent);
+          });
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final product = ModalRoute.of(context)!.settings.arguments as Product;
-    String grupal = "abc";
+    //String grupal = "abc";
     /* ID da cor no banco é selecionada */
-    int selectedColor = 0;
+    //int selectedColor = 0;
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -90,16 +125,19 @@ class RouteProduct extends StatelessWidget {
               onTap: () {
                 var cart = Provider.of<PCartModel>(context, listen: false);
                 //Provider.of<CartModel>(context, listen: false)
+
+                /* pegar o id da cor, melhorar para pegar do banco */
+                /* por enquanto ficará fixo, mas no futuro deixar dinâmico vindo do banco */
+
                 PurchasedProduct purchasedProduct = PurchasedProduct(
                     id: product.id,
                     url: product.url,
                     title: product.title,
                     desc: product.desc,
-                  favorite: product.favorite,
-                  value: product.value,
-                  colors: [1],
-                  quantity: 3
-                );
+                    favorite: product.favorite,
+                    value: product.value,
+                    colors: [selectedColor.id],
+                    quantity: dropDownQuantity.selectedQuantity);
                 print(purchasedProduct.id);
 
                 if (cart.add(purchasedProduct)) {
@@ -120,16 +158,11 @@ class RouteProduct extends StatelessWidget {
                   );
                 }
                 print(cart.getQuantity());
-
-                //c.add(Product("d","dd","ddd",10,true));
               },
               color: Colors.white,
               colorIcon: Colors.teal,
               colorText: Colors.teal,
             ),
-            /*Consumer<CartModel>(
-                  builder: (_, cart, __) =>
-                      Text("${cart.getQuantity().toString()}")),*/
           ],
         ),
       ),
@@ -209,7 +242,7 @@ class RouteProduct extends StatelessWidget {
                             flex: 8,
                           ),
                           Expanded(
-                            child: Container(height: 30, color: Colors.red),
+                            child: Container(height: 30, color: selectedColor.color),
                             flex: 2,
                           )
                         ],
@@ -227,7 +260,7 @@ class RouteProduct extends StatelessWidget {
                             ),
                             //flex: 5,
                           ),
-                          WDropDownQuantityPurchase(),
+                          dropDownQuantity,
                         ],
                       )
                     ],
@@ -251,7 +284,8 @@ class RouteProduct extends StatelessWidget {
                   //---------------- Avaliações
                   WButton(
                     onTap: () {
-                      Navigator.pushNamed(context, '/feedback', arguments: product);
+                      Navigator.pushNamed(context, '/feedback',
+                          arguments: product);
                     },
                     width: MediaQuery.of(context).size.width,
                     icon: Icons.feedback,
@@ -270,7 +304,16 @@ class RouteProduct extends StatelessWidget {
     );
   }
 }
+/* *************************************************************** */
+class ColorAPI{
+  int id;
+  String name;
+  Color color;
 
+  ColorAPI({required this.id, required this.name, required this.color});
+}
+
+/* *************************************************************** */
 class ColorSelector extends StatefulWidget {
   const ColorSelector({Key? key}) : super(key: key);
 
@@ -318,23 +361,25 @@ class _ColorSelectorState extends State<ColorSelector> {
   }
 }
 
-/// This is the stateful widget that the main application instantiates.
+/* *************************************************************** */
+/* Dropdown de quantidade */
 class WDropDownQuantityPurchase extends StatefulWidget {
-  const WDropDownQuantityPurchase({Key? key}) : super(key: key);
+  int selectedQuantity;
+
+  WDropDownQuantityPurchase({Key? key, required this.selectedQuantity})
+      : super(key: key);
 
   @override
   State<WDropDownQuantityPurchase> createState() =>
       _WDropDownQuantityPurchaseState();
 }
 
-/// This is the private State class that goes with MyStatefulWidget.
 class _WDropDownQuantityPurchaseState extends State<WDropDownQuantityPurchase> {
-  int dropdownValue = 1;
-
   @override
   Widget build(BuildContext context) {
     return DropdownButton<int>(
-      value: dropdownValue,
+      hint: Text("Selecione a quantidade"),
+      value: widget.selectedQuantity,
       icon: const Icon(
         Icons.arrow_downward,
       ),
@@ -345,27 +390,29 @@ class _WDropDownQuantityPurchaseState extends State<WDropDownQuantityPurchase> {
         height: 2,
         color: Colors.teal,
       ),
-      onChanged: (int ? newValue) {
+      onChanged: (int? newValue) {
         setState(() {
-          dropdownValue = newValue!;
+          widget.selectedQuantity = newValue!;
+          print("novo ${widget.selectedQuantity}");
         });
       },
-      items: <int>[1,2,3,4]
-          .map<DropdownMenuItem<int>>((int value) {
+      items: <int>[1, 2, 3, 4, 5].map<DropdownMenuItem<int>>((int quantity) {
         return DropdownMenuItem<int>(
-          value: value,
-          child: (value == '1' ? Text('$value item') : Text('$value itens')),
+          value: quantity,
+          child: (Text('${quantity} itens')),
         );
       }).toList(),
     );
   }
 }
+/* *************************************************************** */
 
+/* Círculo seletor de cor */
 class WidgetColorSelector extends StatefulWidget {
   Function()? onTap = () {};
-  Color color;
+  ColorAPI colorAPI;
 
-  WidgetColorSelector({Key? key, this.onTap, this.color = Colors.blueAccent})
+  WidgetColorSelector({Key? key, this.onTap, required this.colorAPI})
       : super(key: key);
 
   @override
@@ -382,7 +429,7 @@ class _WidgetColorSelectorState extends State<WidgetColorSelector> {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(100),
-            color: widget.color,
+            color: widget.colorAPI.color,
           ),
           width: 25,
           height: 25,
@@ -390,4 +437,4 @@ class _WidgetColorSelectorState extends State<WidgetColorSelector> {
       ),
     );
   }
-}
+} /* *************************************************************** */

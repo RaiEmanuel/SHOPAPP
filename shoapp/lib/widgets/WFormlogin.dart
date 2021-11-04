@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:shoapp/main.dart';
+import 'package:shoapp/utils/SharedPreferencesApp.dart';
 import 'WTextFormField.dart';
 import 'package:lottie/lottie.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:shoapp/connection/Connection.dart';
 import 'dart:convert';
-import 'package:shoapp/utils/SharedPreferencesApp.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WFormLogin extends StatefulWidget {
@@ -32,7 +33,6 @@ class _WFormLoginState extends State<WFormLogin> {
         icon: Icons.password,
       );
 
-  //SharedPreferencesApp s = SharedPreferencesApp();
   @override
   void initState() {}
 
@@ -93,37 +93,30 @@ class _WFormLoginState extends State<WFormLogin> {
                           borderRadius: BorderRadius.circular(10)),
                       textStyle: TextStyle(fontSize: 24),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        Connection.auth(wTextFormFieldEmail.getText(),wTextFormFieldPassword.getText()).then((value) {
-                          Map<String, dynamic> response = jsonDecode(value);
-                          if (response['token'] != null) {
-                            print("logou = ${response['token']}");
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text("Sucesso ao logar!"),
-                              backgroundColor: Colors.green,
-                            ));
-                            final sharedPreferenceApp =
-                                SharedPreferences.getInstance().then((SharedPreferences value) {
-                              value.setString("type", response['type']).then((value) {
-                                print("Salvou type... ");
-                              });
-                              String pegou = value.getString("type")!;
-                              print("peogooooooou = ===== ${pegou}");
-                              value.setString("token", response['token']).then((value) {
-                                print("Salvou token...");
-                              });
-                            });
-                            //muda de tela
-                            //Navigator.pushReplacementNamed(context, '/');
-                            Navigator.pushNamed(context, '/');
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text("Credenciais erradas!"),
-                              backgroundColor: Colors.red,
-                            ));
-                          }
-                        });
+                        String responseJson = await Connection.auth(
+                            wTextFormFieldEmail.getText(),
+                            wTextFormFieldPassword.getText());
+                        Map<String, dynamic> response =
+                            jsonDecode(responseJson);
+                        if (response['token'] != null) {//logou
+                          print("logou, token = ${response['token']}");
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text("Sucesso ao logar!"),
+                            backgroundColor: Colors.green,
+                          ));
+                          await UserSecureStorage.setType("bearer");
+                          await UserSecureStorage.setToken(response['token']);
+                          String? tokenSalvo = await UserSecureStorage.getToken();
+                          print("salvou certo = ${tokenSalvo}");
+                          Navigator.pushNamed(context, '/');
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text("Credenciais erradas!"),
+                            backgroundColor: Colors.red,
+                          ));
+                        }
                       }
                     },
                     child: Row(

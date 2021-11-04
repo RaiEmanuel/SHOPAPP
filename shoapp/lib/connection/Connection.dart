@@ -25,6 +25,16 @@ class Connection{
     return res.body;
   }
 
+  static Future<String> teste() async{
+    String url = Uri.encodeFull("https://api.api-futebol.com.br/v1/campeonatos/10/tabela");
+    Map<String, String> header = {'Authorization':'Bearer live_c11420093039a0b278ebc81933132e'};
+    http.Response x = await http.get(Uri.parse(url), headers: header);
+    //print("$x");
+    //print("---------------------------------");
+    //print("${x.body}");
+    return x.body;
+  }
+
   static Future<String> auth(String login, String password) async {
     var client = http.Client();
     try {
@@ -77,16 +87,20 @@ class Connection{
         //"Content-Type":"text/plain"
         //'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
       });
+      print("comprooooooooooou???? ${uriResponse.body}");
       return uriResponse.body;
     } finally {
       client.close();
     }
   }
 
-  static Future<String> getAllPurchases()async{
+  static Future<String> getAllPurchases(String type, String token)async{
     var client = http.Client();
-    var uriResponse = await client.get(Uri.parse('https://fakeecommerceapi.herokuapp.com/purchases'));
-    //headers: {"Authorization":type+" "+token});
+    var uriResponse = await client.get(
+        Uri.parse('https://fakeecommerceapi.herokuapp.com/purchases'),
+        headers: {"Authorization":type+" "+token}
+    );
+
     print("trouxe xxxxxxxx ${uriResponse.body}");
 
     return uriResponse.body;

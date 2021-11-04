@@ -47,6 +47,8 @@ dependencies:
   geolocator: ^7.7.0
   geocoding: ^2.0.1
   image_picker: ^0.8.4+2
+  flutter_svg: ^0.23.0+1
+  flutter_secure_storage: ^4.2.1
 
 
 dev_dependencies:
@@ -58,7 +60,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^1.0.0
+  # flutter_lints: ^1.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -76,11 +78,7 @@ flutter:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
   assets:
-    - assets/product1.png
-    - assets/product2.png
-    - assets/product3.png
     - assets/ed.png
-    - assets/moyses.jpg
     #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -93,9 +91,13 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
+  fonts:
+    - family: Visby
+      fonts:
+        - asset: fonts/visbyRegular.otf
+        - asset: fonts/visbyBold.otf
+
+
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic

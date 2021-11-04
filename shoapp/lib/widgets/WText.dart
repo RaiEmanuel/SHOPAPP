@@ -29,7 +29,11 @@ class WText extends StatelessWidget {
       child: Text(
         text,
         style: TextStyle(
-            color: color, fontWeight: FontWeight.bold, fontSize: fontHeight),
+            color: color,
+            fontWeight: FontWeight.bold,
+            fontSize: fontHeight,
+            fontFamily: "Visby"
+        ),
       ),
     );
   }
