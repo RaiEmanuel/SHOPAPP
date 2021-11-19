@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:shoapp/Address.dart';
+import 'package:shoapp/model/Address.dart';
 import 'package:shoapp/connection/Connection.dart';
 import 'package:shoapp/utils/SharedPreferencesApp.dart';
-
-import '../main.dart';
+import 'package:animations/animations.dart';
 
 class RouteMyPuchases extends StatefulWidget {
   const RouteMyPuchases({Key? key}) : super(key: key);
@@ -25,6 +24,7 @@ class _RouteMyPuchasesState extends State<RouteMyPuchases> {
   List<Placemark> locais = [];
   Address? address;
   List<dynamic> listPurchases = [];
+  bool selected = false;
 
   //SharedPreferencesApp sharedPreferencesApp = SharedPreferencesApp();
 
@@ -99,9 +99,15 @@ class _RouteMyPuchasesState extends State<RouteMyPuchases> {
                     },
                     leading: Icon(Icons.shopping_cart,color: Colors.teal,),
                     trailing: IconButton(
-                      onPressed: (){},
-                      icon: Icon(Icons.remove_red_eye),
-                    ),
+                        onPressed: (){
+                          setState((){
+                            print("mudoooou");
+                            selected = !selected;
+                          });
+                        },
+                        icon: Icon(Icons.remove_red_eye),
+                      ),
+                    /**/
                     title: (listPurchases[index]['id'] != null)? Text("Compra - ${listPurchases[index]['id']}") : Text("Desconhecido"),
                     subtitle: (listPurchases[index]['street'] != null)? Text("${listPurchases[index]['street']}") : Text("Desconhecido"),
                   );

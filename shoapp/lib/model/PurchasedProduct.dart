@@ -24,16 +24,12 @@ class PurchasedProduct {
     switch(idColor){
       case 2:
         return Colors.black;
-        break;
       case 3:
         return Colors.blueAccent;
-        break;
       case 4:
         return Colors.redAccent;
-        break;
       case 6:
         return Colors.grey;
-        break;
     }
     return Colors.black;
   }

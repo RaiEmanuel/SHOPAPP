@@ -3,7 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:shoapp/Address.dart';
+import 'package:shoapp/model/Address.dart';
 
 class RouteMap extends StatefulWidget {
   const RouteMap({Key? key}) : super(key: key);
@@ -33,7 +33,7 @@ class _RouteMapState extends State<RouteMap> {
       address!.latitude = _target.latitude.toString();
       address!.longitude = _target.longitude.toString();
       address!.street = locais[0].name!;
-      print("addddrrrrreesssss = ${value}");
+      //print("addddrrrrreesssss = ${value}");
     });
     //_listenerLocalizacao();
   }

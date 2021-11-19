@@ -1,19 +1,19 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shoapp/widgets/WButton.dart';
-import '../Product.dart';
-import './WText.dart';
+import 'package:lottie/lottie.dart';
+import 'package:shoapp/model/Product.dart';
 import 'package:shoapp/connection/Connection.dart';
 
 Widget wCardProduct(List<Product> products, BuildContext context) {
   return Container(
-    height: 400,
+    height: 450,
     child: FutureBuilder(
       future: Connection.products(),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.connectionState != ConnectionState.done)
           return Container(
             height: 300,
-            child: Text("carregando"),
+            child: Lottie.network("https://assets4.lottiefiles.com/datafiles/bEYvzB8QfV3EM9a/data.json"),
           );
         if (snapshot.hasError) return Text("deu uma falhada");
         if (!snapshot.hasData) return Text("zerado");
@@ -45,12 +45,72 @@ class _WCardState extends State<WCard> {
   Product p;
 
   _WCardState(this.p) {
-    this.isFavorite = p.favorite;
+    this.isFavorite = false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Padding(
+      padding: const EdgeInsets.only(top: 50),
+      child: Container(
+        width: 250,
+        //height: 100,
+        margin: EdgeInsets.only(right: 20),
+        color: Colors.teal,
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+          Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Image.network(
+                  p.picture,
+                  fit: BoxFit.scaleDown,
+                  //width: 250,
+                  //height: 250,
+                ),
+              ),
+            Positioned(
+              bottom: 0,
+              child: Container(
+                color: Colors.white,
+                height: 150,
+                width: 250,
+                child: Column(
+                  //mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+                  children: [
+                    SizedBox(height: 20,),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                        p.name,
+                        style: TextStyle(
+                            fontFamily: "VisbyExtraBold",
+                            fontSize: 20,
+                            color: Colors.teal,
+                            fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      "R\$ ${p.value.toString()}",
+                      style: TextStyle(
+                          fontFamily: "Visby",
+                          fontSize: 25,
+                          color: Colors.amber,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ],
+          alignment: AlignmentDirectional.topCenter,
+        ),
+      ),
+    );
+    /*Container(
       width: 300,
       height: 500,
       color: Colors.white,
@@ -68,7 +128,7 @@ class _WCardState extends State<WCard> {
                 child: AspectRatio(
                   aspectRatio: 1,
                   child: Image.network(
-                    p.url,
+                    p.picture,
                     fit: BoxFit.scaleDown,
                   ),
                 )),
@@ -77,7 +137,7 @@ class _WCardState extends State<WCard> {
             ),
             Align(
               child: Text(
-                p.title,
+                p.name,
                 style: TextStyle(
                   fontFamily: "VisbyExtraBold",
                   fontSize: 20,
@@ -94,21 +154,20 @@ class _WCardState extends State<WCard> {
                     child: Text(
                       "R\$ ${p.value.toString()}",
                       style: TextStyle(
-                        fontFamily: "Visby",
-                        fontSize: 25,
-                        color: Colors.amber
-                      ),
+                          fontFamily: "Visby",
+                          fontSize: 25,
+                          color: Colors.amber),
                     ),
                     flex: 8,
                     fit: FlexFit.tight,
                   ),
                   Flexible(
-                      child: IconButton(
-                        onPressed: (){},
-                        icon: Icon(Icons.favorite_border),
-                      ),
-                      flex: 2,
-                      fit: FlexFit.tight,
+                    child: IconButton(
+                      onPressed: () {},
+                      icon: Icon(Icons.favorite_border),
+                    ),
+                    flex: 2,
+                    fit: FlexFit.tight,
                   ),
                 ],
               ),
@@ -116,7 +175,7 @@ class _WCardState extends State<WCard> {
           ],
         ),
       ),
-    );
+    );*/
     /*Card(
         color: Colors.white70,
         //shadowColor: Colors.black26,

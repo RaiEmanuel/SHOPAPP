@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
-import 'package:shoapp/widgets/WFormlogin.dart';
+import 'package:shoapp/routes/login/widget/WFormlogin.dart';
 import 'package:shoapp/connection/Connection.dart';
 
 class Category {

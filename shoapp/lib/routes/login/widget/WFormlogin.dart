@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shoapp/main.dart';
+import 'package:shoapp/model/User.dart';
 import 'package:shoapp/utils/SharedPreferencesApp.dart';
-import 'WTextFormField.dart';
+import '../../../utils/WTextFormField.dart';
 import 'package:lottie/lottie.dart';
 import 'package:line_icons/line_icons.dart';
 import 'package:shoapp/connection/Connection.dart';
@@ -95,19 +96,18 @@ class _WFormLoginState extends State<WFormLogin> {
                     ),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        String responseJson = await Connection.auth(
+                       Credential credential = await Connection.auth(
                             wTextFormFieldEmail.getText(),
                             wTextFormFieldPassword.getText());
-                        Map<String, dynamic> response =
-                            jsonDecode(responseJson);
-                        if (response['token'] != null) {//logou
-                          print("logou, token = ${response['token']}");
+
+                        if (credential.token != null) {//logou
+                          print("logou, token = ${credential.token}");
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text("Sucesso ao logar!"),
                             backgroundColor: Colors.green,
                           ));
                           await UserSecureStorage.setType("bearer");
-                          await UserSecureStorage.setToken(response['token']);
+                          await UserSecureStorage.setToken(credential.token!);
                           String? tokenSalvo = await UserSecureStorage.getToken();
                           print("salvou certo = ${tokenSalvo}");
                           Navigator.pushNamed(context, '/');

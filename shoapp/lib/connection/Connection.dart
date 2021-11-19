@@ -1,9 +1,12 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:shoapp/PurchasedProduct.dart';
-import 'package:shoapp/Address.dart';
-import 'package:shoapp/PurchasedProduct.dart';
+import 'package:shoapp/model/PurchasedProduct.dart';
+import 'package:shoapp/model/Address.dart';
+import 'package:shoapp/model/Feedback.dart';
+import 'package:shoapp/model/Product.dart';
+import 'package:shoapp/model/User.dart';
+
 //import 'package:shoapp/Aux'
 
 /* classe auxiliar apenas para enviar pela api */
@@ -16,7 +19,7 @@ class AuxPurchasedProduct{
 
 class Connection{
 
-  static String _host = "jsonplaceholder.typicode.com";
+  //static String _host = "jsonplaceholder.typicode.com";
   static Future<String> getAttr() async{
     var client = http.Client();
     await Future.delayed(Duration(seconds: 3), ()=>"a");
@@ -35,35 +38,84 @@ class Connection{
     return x.body;
   }
 
-  static Future<String> auth(String login, String password) async {
+  static Future<Credential> auth(String login, String password) async {
     var client = http.Client();
     try {
       var uriResponse = await client.post(Uri.parse('https://fakeecommerceapi.herokuapp.com/auth'),
           body: {'email': login, 'password': password});
-      return uriResponse.body;
-
+      Credential credential = Credential.fromJson(jsonDecode(uriResponse.body));
+      return credential;
     } finally {
     client.close();
     }
   }
 
-  static Future<String> me(String type, String token) async {
+  static Future<User> me(String type, String token) async {
     var client = http.Client();
     try {
       var uriResponse = await client.get(Uri.parse('https://fakeecommerceapi.herokuapp.com/me'),
       headers: {"Authorization":type+" "+token});
-      return uriResponse.body;
+      User meUser = User.fromJson(jsonDecode(uriResponse.body));
+      return meUser;
     } finally {
       client.close();
     }
   }
 
-  static Future<String> products() async {
+  static Future<User> getUser(int idUser) async {
+    var client = http.Client();
+    try {
+      var uriResponse = await client.get(Uri.parse('https://fakeecommerceapi.herokuapp.com/users/${idUser}'));
+          //headers: {"Authorization":type+" "+token});
+      print("usuario buscadoooo = ${jsonDecode(uriResponse.body)}");
+      User user = User.fromJson(jsonDecode(uriResponse.body));
+      return user;
+    } finally {
+      client.close();
+    }
+  }
+
+  static Future<List<Product>> products() async {
     var client = http.Client();
     try {
       var uriResponse = await client.get(Uri.parse('https://fakeecommerceapi.herokuapp.com/products'));
-          //headers: {"Authorization":type+" "+token});
-      return uriResponse.body;
+      List<dynamic> listDynamic = jsonDecode(uriResponse.body);
+      List<Product> listProduct = [];
+      for(dynamic d in listDynamic){
+        listProduct.add(Product.fromJson(d));
+      }
+      return Future.value(listProduct);
+    } finally {
+      client.close();
+    }
+  }
+
+  static Future<void> postFeedback(String token, FeedbackProduct feedback) async{
+    var client = http.Client();
+    var uriResponse = await client.post(Uri.parse('https://fakeecommerceapi.herokuapp.com/feedbacks'),
+        body: jsonEncode(feedback.toJson()),
+        headers: {
+          "Authorization":"bearer "+token,
+          'Content-Type': 'application/json; charset=UTF-8',
+    });
+    print("postouuu feed? ${uriResponse.body}");
+  }
+
+  static Future<List<FeedbackProduct>> ? feedbacks(int idProduct) async {
+    var client = http.Client();
+    try {
+      var uriResponse = await client.get(Uri.parse('https://fakeecommerceapi.herokuapp.com/feedbacks/${idProduct}'));
+      List<dynamic> listDynamic = jsonDecode(uriResponse.body);
+
+      print("dunamico = ${listDynamic}");
+      //Feedback f = Feedback.fromJson(listDynamic[0]);
+
+      List<FeedbackProduct> listFeedback = [];
+      for(dynamic d in listDynamic){
+        listFeedback.add(FeedbackProduct.fromJson(d));
+        print("fffffffffffffffffff = ${d}");
+      }
+      return Future.value(listFeedback);
     } finally {
       client.close();
     }

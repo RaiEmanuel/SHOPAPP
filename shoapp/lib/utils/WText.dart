@@ -5,9 +5,8 @@ class WText extends StatelessWidget {
   final Color color;
   final double topPadding, rightPadding, bottomPadding, leftPadding, fontHeight;
 
-  WText(
-      {Key? key,
-      this.text = "Default",
+  WText({Key? key,
+      required this.text,
       this.color = Colors.white,
       this.topPadding = 0,
       this.rightPadding = 0,

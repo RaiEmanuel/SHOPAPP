@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:shoapp/Product.dart';
-import 'package:shoapp/PurchasedProduct.dart';
-import 'package:shoapp/widgets/WButton.dart';
+import 'package:shoapp/model/PurchasedProduct.dart';
+import 'package:shoapp/model/Product.dart';
+import 'package:shoapp/utils/ColorApi.dart';
+import 'package:shoapp/utils/WButton.dart';
 import 'package:provider/provider.dart';
 import 'package:shoapp/pCartModel.dart';
+import 'package:shoapp/utils/WidgetColorSelector.dart';
 
 class RouteProduct extends StatefulWidget {
   const RouteProduct({Key? key}) : super(key: key);
@@ -118,9 +120,9 @@ class _RouteProductState extends State<RouteProduct> {
               ),
             ),
             WButton(
+              text: "Comprar",
               width: 200,
               height: 50,
-              text: "Comprar",
               icon: Icons.shopping_cart,
               onTap: () {
                 var cart = Provider.of<PCartModel>(context, listen: false);
@@ -131,11 +133,11 @@ class _RouteProductState extends State<RouteProduct> {
 
                 PurchasedProduct purchasedProduct = PurchasedProduct(
                     id: product.id,
-                    url: product.url,
-                    title: product.title,
-                    desc: product.desc,
-                    favorite: product.favorite,
-                    value: product.value,
+                    url: product.picture,
+                    title: product.name,
+                    desc: product.description,
+                    favorite: false,
+                    value: double.parse(product.value.toString()),
                     colors: [selectedColor.id],
                     quantity: dropDownQuantity.selectedQuantity);
                 print(purchasedProduct.id);
@@ -145,7 +147,7 @@ class _RouteProductState extends State<RouteProduct> {
                     SnackBar(
                       backgroundColor: Colors.teal,
                       content: Text(
-                          "Produto ${product.title} adicionado com sucesso!"),
+                          "Produto ${product.name} adicionado com sucesso!"),
                     ),
                   );
                 } else {
@@ -153,7 +155,7 @@ class _RouteProductState extends State<RouteProduct> {
                     SnackBar(
                       backgroundColor: Colors.red,
                       content:
-                          Text("Produto ${product.title} já está no carrinho!"),
+                          Text("Produto ${product.name} já está no carrinho!"),
                     ),
                   );
                 }
@@ -191,7 +193,7 @@ class _RouteProductState extends State<RouteProduct> {
                   child: AspectRatio(
                     aspectRatio: 1,
                     child: Image.network(
-                      product.url.toString(),
+                      product.picture.toString(),
                       fit: BoxFit.scaleDown,
                     ),
                   ),
@@ -216,7 +218,7 @@ class _RouteProductState extends State<RouteProduct> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         //titulo do produto
-                        product.title.toString(),
+                        product.name.toString(),
                         style: TextStyle(
                             fontSize: 26, fontWeight: FontWeight.bold),
                       ),
@@ -272,7 +274,7 @@ class _RouteProductState extends State<RouteProduct> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      product.desc.toString(),
+                      product.description.toString(),
                       style: TextStyle(
                         fontSize: 20,
                       ),
@@ -283,13 +285,13 @@ class _RouteProductState extends State<RouteProduct> {
                   ),
                   //---------------- Avaliações
                   WButton(
+                    text: "Ver Feedback do produto",
                     onTap: () {
                       Navigator.pushNamed(context, '/feedback',
                           arguments: product);
                     },
                     width: MediaQuery.of(context).size.width,
                     icon: Icons.feedback,
-                    text: "Ver Feedback do produto",
                   ),
                   //Container(width: MediaQuery.of(context).size.width,color: Colors.greenAccent,child: Expanded(child: Text("ssss"))),
                   SizedBox(
@@ -301,62 +303,6 @@ class _RouteProductState extends State<RouteProduct> {
           ),
         ],
       ),
-    );
-  }
-}
-/* *************************************************************** */
-class ColorAPI{
-  int id;
-  String name;
-  Color color;
-
-  ColorAPI({required this.id, required this.name, required this.color});
-}
-
-/* *************************************************************** */
-class ColorSelector extends StatefulWidget {
-  const ColorSelector({Key? key}) : super(key: key);
-
-  @override
-  _ColorSelectorState createState() => _ColorSelectorState();
-}
-
-class _ColorSelectorState extends State<ColorSelector> {
-  String grupal = "aaa";
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 120,
-          height: 60,
-          child: RadioListTile<String>(
-            title: Text("Radio"),
-            value: "abc",
-            groupValue: grupal,
-            onChanged: (String? value) {
-              setState(() {
-                grupal = value!;
-              });
-            },
-          ),
-        ),
-        Container(
-          width: 120,
-          height: 60,
-          child: RadioListTile<String>(
-            title: Text("Radio"),
-            value: "def",
-            groupValue: grupal,
-            onChanged: (String? value) {
-              setState(() {
-                grupal = value!;
-              });
-            },
-          ),
-        ),
-      ],
     );
   }
 }
@@ -408,33 +354,3 @@ class _WDropDownQuantityPurchaseState extends State<WDropDownQuantityPurchase> {
 /* *************************************************************** */
 
 /* Círculo seletor de cor */
-class WidgetColorSelector extends StatefulWidget {
-  Function()? onTap = () {};
-  ColorAPI colorAPI;
-
-  WidgetColorSelector({Key? key, this.onTap, required this.colorAPI})
-      : super(key: key);
-
-  @override
-  _WidgetColorSelectorState createState() => _WidgetColorSelectorState();
-}
-
-class _WidgetColorSelectorState extends State<WidgetColorSelector> {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: widget.onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(100),
-            color: widget.colorAPI.color,
-          ),
-          width: 25,
-          height: 25,
-        ),
-      ),
-    );
-  }
-} /* *************************************************************** */

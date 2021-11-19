@@ -1,6 +1,6 @@
 import 'dart:collection';
 import 'package:flutter/material.dart';
-import 'package:shoapp/PurchasedProduct.dart';
+import 'package:shoapp/model/PurchasedProduct.dart';
 
 class PCartModel extends ChangeNotifier {
   final List<PurchasedProduct> _productsList = [];
